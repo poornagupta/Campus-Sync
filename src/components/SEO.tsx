@@ -12,7 +12,7 @@ interface SEOProps {
   modifiedTime?: string;
 }
 
-const PUBLIC_IMAGE_URL = 'https://campus-sync-66mb.vercel.app/social-preview.jpg';
+const PUBLIC_IMAGE_URL = 'https://campus-sync-66mb.vercel.app/preview.jpg';
 
 const defaultSEO = {
   title: 'CampusSync - Complete Student Management Platform',
