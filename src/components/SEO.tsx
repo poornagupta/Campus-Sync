@@ -1,5 +1,4 @@
 import { Helmet } from 'react-helmet-async';
-import socialPreview from '@/assets/social-preview.jpg';
 
 interface SEOProps {
   title?: string;
@@ -13,14 +12,16 @@ interface SEOProps {
   modifiedTime?: string;
 }
 
+const PUBLIC_IMAGE_URL = 'https://campus-sync-66mb.vercel.app/social-preview.jpg';
+
 const defaultSEO = {
   title: 'CampusSync - Complete Student Management Platform',
   description: 'Transform your academic journey with CampusSync - the ultimate student management platform featuring timetables, grade tracking, expense management, study tools, and community features.',
-  image: socialPreview,
+  image: PUBLIC_IMAGE_URL,
   type: 'website',
   keywords: 'student management, academic planner, grade tracker, expense tracker, study tools, campus life, education app, student productivity',
   author: 'CampusSync Team',
-  url: typeof window !== 'undefined' ? window.location.origin : 'https://campussync.lovable.app'
+  url: 'https://campus-sync-66mb.vercel.app/'
 };
 
 export function SEO({
@@ -36,7 +37,7 @@ export function SEO({
 }: SEOProps) {
   const seoTitle = title ? `${title} | CampusSync` : defaultSEO.title;
   const seoUrl = url || (typeof window !== 'undefined' ? window.location.href : defaultSEO.url);
-  const seoImage = typeof image === 'string' && image.startsWith('http') ? image : `${defaultSEO.url}${image}`;
+  const seoImage = image.startsWith('http') ? image : `${defaultSEO.url.replace(/\/$/, '')}/${image.replace(/^\//, '')}`;
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -61,7 +62,6 @@ export function SEO({
 
   return (
     <Helmet>
-      {/* Basic Meta Tags */}
       <title>{seoTitle}</title>
       <meta name="description" content={description} />
       <meta name="keywords" content={keywords} />
@@ -71,10 +71,10 @@ export function SEO({
       <meta httpEquiv="Content-Language" content="en" />
       <meta name="theme-color" content="#3B82F6" />
 
-      {/* Canonical URL */}
+      {/* Canonical */}
       <link rel="canonical" href={seoUrl} />
 
-      {/* Open Graph / Facebook */}
+      {/* Open Graph */}
       <meta property="og:type" content={type} />
       <meta property="og:title" content={seoTitle} />
       <meta property="og:description" content={description} />
@@ -86,12 +86,9 @@ export function SEO({
       <meta property="og:url" content={seoUrl} />
       <meta property="og:site_name" content="CampusSync" />
       <meta property="og:locale" content="en_US" />
-
-      {/* WhatsApp specific optimizations */}
       <meta property="og:image:secure_url" content={seoImage} />
-      <meta name="thumbnail" content={seoImage} />
 
-      {/* Twitter Card */}
+      {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={seoTitle} />
       <meta name="twitter:description" content={description} />
@@ -100,33 +97,26 @@ export function SEO({
       <meta name="twitter:creator" content="@CampusSync" />
       <meta name="twitter:site" content="@CampusSync" />
 
-      {/* Additional meta tags for better social sharing */}
+      {/* General image meta */}
       <meta name="image" content={seoImage} />
       <meta itemProp="name" content={seoTitle} />
       <meta itemProp="description" content={description} />
       <meta itemProp="image" content={seoImage} />
 
-      {/* WhatsApp specific */}
-      <meta property="og:image:type" content="image/jpeg" />
-
-      {/* Article specific meta tags */}
+      {/* Article */}
       {publishedTime && <meta property="article:published_time" content={publishedTime} />}
       {modifiedTime && <meta property="article:modified_time" content={modifiedTime} />}
 
       {/* Structured Data */}
-      <script type="application/ld+json">
-        {JSON.stringify(structuredData)}
-      </script>
+      <script type="application/ld+json">{JSON.stringify(structuredData)}</script>
 
-      {/* Favicon and App Icons */}
+      {/* Icons */}
       <link rel="icon" type="image/x-icon" href="/favicon.ico" />
       <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico" />
-      
-      {/* Preconnect to external domains for performance */}
+
+      {/* Performance */}
       <link rel="preconnect" href="https://fonts.googleapis.com" />
       <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-      
-      {/* DNS Prefetch for performance */}
       <link rel="dns-prefetch" href="//fonts.googleapis.com" />
       <link rel="dns-prefetch" href="//fonts.gstatic.com" />
     </Helmet>
