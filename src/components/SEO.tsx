@@ -12,7 +12,7 @@ interface SEOProps {
   modifiedTime?: string;
 }
 
-const PUBLIC_IMAGE_URL = 'https://campus-sync-66mb.vercel.app/preview.jpg';
+const PUBLIC_IMAGE_URL = 'https://campus-sync-seven.vercel.app/preview.jpg';
 
 const defaultSEO = {
   title: 'CampusSync - Complete Student Management Platform',
@@ -21,7 +21,7 @@ const defaultSEO = {
   type: 'website',
   keywords: 'student management, academic planner, grade tracker, expense tracker, study tools, campus life, education app, student productivity',
   author: 'CampusSync Team',
-  url: 'https://campus-sync-66mb.vercel.app/'
+  url: 'https://campus-sync-seven.vercel.app/preview.jpg'
 };
 
 export function SEO({
