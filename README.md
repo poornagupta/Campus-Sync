@@ -5,7 +5,7 @@
 CampusSync is a modern, comprehensive educational management platform designed by **Mausam Kar** to streamline academic operations for students, teachers, and administrators. Built with cutting-edge technologies, it provides a unified solution for managing all aspects of campus life.
 
 **Developer**: Mausam Kar
-**Live Demo**: https://lovable.dev/projects/8c8ba721-0263-4934-b067-fa6a90b9418b
+**Live Demo**: https://campus-sync-seven.vercel.app/auth
 
 ## ✨ Key Features
 
@@ -154,7 +154,10 @@ npm run build
 
 ## 🎨 Editing Your Application
 
-### Using Lovable (Recommended)
+### Using the Deployed Application (Recommended)
+Simply visit [CampusSync](https://campus-sync-seven.vercel.app/auth) to access the live application.
+
+### Using Lovable (Development Only)
 Simply visit the [Lovable Project](https://lovable.dev/projects/8c8ba721-0263-4934-b067-fa6a90b9418b) and start prompting. Changes made via Lovable will be committed automatically to this repo.
 
 ### Using Your Preferred IDE
@@ -167,7 +170,11 @@ You can clone this repo and push changes. Pushed changes will also be reflected 
 
 ## 🚀 Deployment
 
-### Lovable Hosting
+### Vercel Deployment
+The application is deployed on Vercel and can be accessed at:
+[https://campus-sync-seven.vercel.app/auth](https://campus-sync-seven.vercel.app/auth)
+
+### Lovable Hosting (Development)
 Simply open [Lovable](https://lovable.dev/projects/8c8ba721-0263-4934-b067-fa6a90b9418b) and click on Share → Publish.
 
 ### Custom Domain
