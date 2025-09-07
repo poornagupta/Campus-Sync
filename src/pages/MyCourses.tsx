@@ -139,9 +139,9 @@ const MyCourses = () => {
       <div className="flex items-center gap-3">
         <BookOpen className="h-8 w-8 text-primary" />
         <div>
-          <h1 className="text-3xl font-bold">My Courses</h1>
+          <h1 className="mobile-heading font-bold">My Courses</h1>
           {currentBranch && (
-            <p className="text-muted-foreground">{currentBranch.name}</p>
+            <p className="text-muted-foreground mobile-hide-description">{currentBranch.name}</p>
           )}
         </div>
       </div>

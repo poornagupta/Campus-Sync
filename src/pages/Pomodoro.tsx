@@ -142,8 +142,8 @@ const Pomodoro = () => {
             <Clock className="h-8 w-8 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">Pomodoro Timer</h1>
-            <p className="text-muted-foreground text-lg">Stay focused and productive</p>
+            <h1 className="mobile-heading-large font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">Pomodoro Timer</h1>
+            <p className="text-muted-foreground text-lg mobile-hide-description">Stay focused and productive</p>
           </div>
         </div>
         <div className="flex gap-2">

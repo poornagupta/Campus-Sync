@@ -5,27 +5,28 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Camera, Upload, X } from "lucide-react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Camera, Upload, X, Crop } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { UserData } from "@/hooks/useUserData"
+import { PhotoCropDialog } from "./PhotoCropDialog"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 interface EditProfileDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
-  student: {
-    name: string
-    email: string
-    phone: string
-    address: string
-    avatar: string
-  }
-  onSave: (updatedStudent: any) => void
+  student: UserData
+  onSave: (updatedStudent: Partial<UserData>) => void
 }
 
 export function EditProfileDialog({ open, onOpenChange, student, onSave }: EditProfileDialogProps) {
   const [formData, setFormData] = useState(student)
   const [previewImage, setPreviewImage] = useState<string | null>(null)
+  const [rawImageForCrop, setRawImageForCrop] = useState<string | null>(null)
+  const [showCropDialog, setShowCropDialog] = useState(false)
   const [isUploading, setIsUploading] = useState(false)
   const { toast } = useToast()
+  const isMobile = useIsMobile()
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -41,14 +42,23 @@ export function EditProfileDialog({ open, onOpenChange, student, onSave }: EditP
 
       const reader = new FileReader()
       reader.onloadend = () => {
-        setPreviewImage(reader.result as string)
+        setRawImageForCrop(reader.result as string)
+        setShowCropDialog(true)
       }
       reader.readAsDataURL(file)
     }
+    // Reset input value to allow same file selection
+    event.target.value = ''
+  }
+
+  const handleCropComplete = (croppedImageUrl: string) => {
+    setPreviewImage(croppedImageUrl)
+    setRawImageForCrop(null)
   }
 
   const handleRemoveImage = () => {
     setPreviewImage(null)
+    setRawImageForCrop(null)
   }
 
   const handleSave = async () => {
@@ -79,7 +89,7 @@ export function EditProfileDialog({ open, onOpenChange, student, onSave }: EditP
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className={`${isMobile ? 'sm:max-w-[95vw] max-h-[95vh]' : 'sm:max-w-[600px] max-h-[90vh]'} overflow-y-auto`}>
         <DialogHeader>
           <DialogTitle>Edit Profile</DialogTitle>
           <DialogDescription>
@@ -126,50 +136,105 @@ export function EditProfileDialog({ open, onOpenChange, student, onSave }: EditP
             </div>
           </div>
 
-          {/* Form Fields */}
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
-              <Input
-                id="name"
-                value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Enter your full name"
-              />
-            </div>
+          {/* Form Tabs */}
+          <Tabs defaultValue="personal" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="personal">Personal</TabsTrigger>
+              <TabsTrigger value="academic">Academic</TabsTrigger>
+            </TabsList>
             
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                placeholder="Enter your email"
-              />
-            </div>
+            <TabsContent value="personal" className="space-y-4 mt-6">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Full Name</Label>
+                  <Input
+                    id="name"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="Enter your full name"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    placeholder="Enter your email"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone Number</Label>
+                  <Input
+                    id="phone"
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    placeholder="Enter your phone number"
+                  />
+                </div>
+                
+                
+                <div className="space-y-2 sm:col-span-2">
+                  <Label htmlFor="address">Address</Label>
+                  <Textarea
+                    id="address"
+                    value={formData.address}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    placeholder="Enter your address"
+                    rows={3}
+                  />
+                </div>
+              </div>
+            </TabsContent>
             
-            <div className="space-y-2 sm:col-span-2">
-              <Label htmlFor="phone">Phone Number</Label>
-              <Input
-                id="phone"
-                value={formData.phone}
-                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                placeholder="Enter your phone number"
-              />
-            </div>
-            
-            <div className="space-y-2 sm:col-span-2">
-              <Label htmlFor="address">Address</Label>
-              <Textarea
-                id="address"
-                value={formData.address}
-                onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                placeholder="Enter your address"
-                rows={3}
-              />
-            </div>
-          </div>
+            <TabsContent value="academic" className="space-y-4 mt-6">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div className="space-y-2">
+                  <Label htmlFor="course">Course</Label>
+                  <Input
+                    id="course"
+                    value={formData.course}
+                    onChange={(e) => setFormData({ ...formData, course: e.target.value })}
+                    placeholder="Enter your course"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="year">Year</Label>
+                  <Input
+                    id="year"
+                    value={formData.year}
+                    onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+                    placeholder="Enter your year"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="semester">Semester</Label>
+                  <Input
+                    id="semester"
+                    value={formData.semester}
+                    onChange={(e) => setFormData({ ...formData, semester: e.target.value })}
+                    placeholder="Enter your semester"
+                  />
+                </div>
+                
+                
+                <div className="space-y-2">
+                  <Label htmlFor="cgpa">CGPA</Label>
+                  <Input
+                    id="cgpa"
+                    value={formData.cgpa}
+                    onChange={(e) => setFormData({ ...formData, cgpa: e.target.value })}
+                    placeholder="Enter your CGPA"
+                  />
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
         </div>
 
         <DialogFooter className="flex-col sm:flex-row gap-2">
@@ -188,6 +253,16 @@ export function EditProfileDialog({ open, onOpenChange, student, onSave }: EditP
           </Button>
         </DialogFooter>
       </DialogContent>
+
+      {/* Photo Crop Dialog */}
+      {rawImageForCrop && (
+        <PhotoCropDialog
+          open={showCropDialog}
+          onOpenChange={setShowCropDialog}
+          imageSrc={rawImageForCrop}
+          onCropComplete={handleCropComplete}
+        />
+      )}
     </Dialog>
   )
 }

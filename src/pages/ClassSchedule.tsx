@@ -260,316 +260,436 @@ const DailyPlanner = () => {
   }
 
   return (
-    <div className="h-screen flex flex-col bg-background">
-      {/* Header */}
+    <div className="h-full flex flex-col bg-background">
+      {/* Mobile-First Header */}
       <div className="border-b bg-card">
-        <div className="flex items-center justify-between p-4">
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
-                C
-              </div>
-              <div>
-                <h1 className="font-semibold text-lg">Daily Planner</h1>
-                <p className="text-sm text-muted-foreground">My office events (Copy)</p>
-              </div>
+        {/* Main Header Row */}
+        <div className="flex items-center justify-between p-3 md:p-4">
+          {/* Logo and Title - Always visible */}
+          <div className="flex items-center gap-2 md:gap-4">
+            <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+              C
             </div>
-            
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Event name or task..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 w-64"
-              />
+            <div>
+              <h1 className="font-semibold text-base md:text-lg">Daily Planner</h1>
+              <p className="text-xs md:text-sm text-muted-foreground hidden sm:block">My office events</p>
             </div>
           </div>
-
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="sm">
+          
+          {/* Action Buttons */}
+          <div className="flex items-center gap-1 md:gap-2">
+            <Button variant="ghost" size="sm" className="hidden md:flex">
               <Settings className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="sm">
+            <Button variant="ghost" size="sm" className="hidden md:flex">
               <Bell className="h-4 w-4" />
             </Button>
             <Button onClick={() => setIsDialogOpen(true)} size="sm">
-              <Plus className="h-4 w-4" />
+              <Plus className="h-3 w-3 md:h-4 md:w-4" />
+              <span className="hidden sm:inline ml-1">Add</span>
             </Button>
           </div>
         </div>
 
-        {/* Navigation and View Controls */}
-        <div className="flex items-center justify-between px-4 pb-4">
-          <div className="flex items-center gap-2">
-            <Button
-              variant={viewMode === 'WEEK' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setViewMode('WEEK')}
-            >
-              WEEK
-            </Button>
-            <Button
-              variant={viewMode === 'TODAY' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => goToSpecificDay('TODAY')}
-            >
-              TODAY
-            </Button>
-            <Button
-              variant={viewMode === 'TOMORROW' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => goToSpecificDay('TOMORROW')}
-            >
-              TOMORROW
-            </Button>
-            <Button
-              variant={viewMode === 'YESTERDAY' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => goToSpecificDay('YESTERDAY')}
-            >
-              YESTERDAY
-            </Button>
+        {/* Search Bar - Below title on mobile */}
+        <div className="px-3 pb-3 md:hidden">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search events..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 text-sm"
+            />
           </div>
+        </div>
 
-          <div className="flex items-center gap-4">
-            {viewMode === 'WEEK' && (
-              <div className="flex items-center gap-2">
-                <Button variant="ghost" size="sm" onClick={goToPreviousWeek}>
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="sm" onClick={goToNextWeek}>
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
-            )}
-            
-            <Button variant="outline" size="sm" onClick={goToToday}>
-              Today
-            </Button>
-            
-            <Button 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => setIsCalendarOpen(true)}
-              className="text-sm font-medium hover:bg-accent"
-            >
-              {viewMode === 'WEEK' 
-                ? currentWeek.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
-                : selectedDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
-              }
-              <Calendar className="h-4 w-4 ml-2" />
-            </Button>
+        {/* Desktop Search - Inline with header */}
+        <div className="hidden md:block absolute top-3 left-1/2 transform -translate-x-1/2">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Event name or task..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 w-64"
+            />
+          </div>
+        </div>
+
+        {/* Navigation Controls */}
+        <div className="border-t md:border-t-0 bg-muted/30 md:bg-transparent">
+          {/* View Mode Buttons - Horizontal scroll on mobile */}
+          <div className="flex overflow-x-auto scrollbar-hide p-3 md:px-4 md:pb-4 gap-2">
+            <div className="flex items-center gap-1 md:gap-2 flex-shrink-0">
+              <Button
+                variant={viewMode === 'WEEK' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('WEEK')}
+                className="text-xs md:text-sm px-2 md:px-3"
+              >
+                WEEK
+              </Button>
+              <Button
+                variant={viewMode === 'TODAY' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => goToSpecificDay('TODAY')}
+                className="text-xs md:text-sm px-2 md:px-3"
+              >
+                TODAY
+              </Button>
+              <Button
+                variant={viewMode === 'TOMORROW' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => goToSpecificDay('TOMORROW')}
+                className="text-xs md:text-sm px-2 md:px-3 whitespace-nowrap"
+              >
+                TOMORROW
+              </Button>
+              <Button
+                variant={viewMode === 'YESTERDAY' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => goToSpecificDay('YESTERDAY')}
+                className="text-xs md:text-sm px-2 md:px-3 whitespace-nowrap"
+              >
+                YESTERDAY
+              </Button>
+            </div>
+
+            {/* Navigation and Date Controls */}
+            <div className="flex items-center gap-2 ml-auto flex-shrink-0">
+              {viewMode === 'WEEK' && (
+                <div className="flex items-center gap-1">
+                  <Button variant="ghost" size="sm" onClick={goToPreviousWeek}>
+                    <ChevronLeft className="h-3 w-3 md:h-4 md:w-4" />
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={goToNextWeek}>
+                    <ChevronRight className="h-3 w-3 md:h-4 md:w-4" />
+                  </Button>
+                </div>
+              )}
+              
+              <Button variant="outline" size="sm" onClick={goToToday} className="text-xs md:text-sm">
+                Today
+              </Button>
+              
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => setIsCalendarOpen(true)}
+                className="text-xs md:text-sm font-medium hover:bg-accent max-w-[120px] md:max-w-none"
+              >
+                <span className="truncate">
+                  {viewMode === 'WEEK' 
+                    ? currentWeek.toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+                    : selectedDate.toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric',
+                        ...(window.innerWidth > 768 && { weekday: 'short', year: 'numeric' })
+                      })
+                  }
+                </span>
+                <Calendar className="h-3 w-3 md:h-4 md:w-4 ml-1 flex-shrink-0" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 flex overflow-hidden">
+      <div className="flex-1 flex flex-col md:flex-row min-h-0">
         {/* Calendar Grid */}
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 min-h-0 overflow-auto">
           {viewMode === 'WEEK' ? (
-            <div className="min-w-[800px]">
-              {/* Days Header */}
-              <div className="grid grid-cols-8 border-b sticky top-0 bg-background z-10">
-                <div className="p-4 text-center border-r"></div>
-                {weekDays.map((day, index) => (
-                  <div key={index} className="p-4 text-center border-r">
-                    <div className="text-sm text-muted-foreground">{day.name}</div>
-                    <div className={cn(
-                      "text-2xl font-bold mt-1",
-                      day.isToday && "text-primary"
-                    )}>
-                      {day.date}
-                    </div>
+            <>
+              {/* Desktop Week View */}
+              <div className="hidden lg:block overflow-x-auto">
+                <div className="min-w-[800px]">
+                  {/* Days Header */}
+                  <div className="grid grid-cols-8 border-b sticky top-0 bg-background z-10">
+                    <div className="p-4 text-center border-r min-w-[80px] sticky left-0 bg-background z-20"></div>
+                    {weekDays.map((day, index) => (
+                      <div key={index} className="p-4 text-center border-r min-w-[120px]">
+                        <div className="text-sm text-muted-foreground">{day.name}</div>
+                        <div className={cn(
+                          "text-2xl font-bold mt-1",
+                          day.isToday && "text-primary"
+                        )}>
+                          {day.date}
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
+
+                  {/* Time Grid */}
+                  {timeSlots.map((timeSlot) => (
+                    <div key={timeSlot} className="grid grid-cols-8 border-b min-h-[80px]">
+                      {/* Time Label */}
+                      <div className="p-4 border-r bg-muted/30 flex items-start justify-center min-w-[80px] sticky left-0 z-10">
+                        <span className="text-sm font-medium text-muted-foreground">
+                          {timeSlot}
+                        </span>
+                      </div>
+
+                      {/* Day Columns */}
+                      {weekDays.map((day, dayIndex) => {
+                        const dayEvents = getEventsForSlot(dayIndex, timeSlot);
+                        
+                        return (
+                          <div
+                            key={dayIndex}
+                            className="border-r p-2 cursor-pointer hover:bg-muted/50 transition-colors min-h-[80px] min-w-[120px]"
+                            onClick={() => handleCellClick(dayIndex, timeSlot)}
+                          >
+                            {dayEvents.map((event) => (
+                              <div
+                                key={event.id}
+                                className={cn(
+                                  "p-2 rounded-md mb-1 cursor-pointer hover:shadow-md transition-all",
+                                  event.color
+                                )}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleEditEvent(event);
+                                }}
+                              >
+                                <div className="font-medium text-sm truncate">
+                                  {event.title}
+                                </div>
+                                <div className="text-xs opacity-75 truncate">
+                                  {event.description}
+                                </div>
+                                <div className="text-xs opacity-75 mt-1">
+                                  {event.startTime} - {event.endTime}
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
               </div>
 
-              {/* Time Grid */}
-              {timeSlots.map((timeSlot) => (
-                <div key={timeSlot} className="grid grid-cols-8 border-b min-h-[80px]">
-                  {/* Time Label */}
-                  <div className="p-4 border-r bg-muted/30 flex items-start justify-center">
-                    <span className="text-sm font-medium text-muted-foreground">
-                      {timeSlot}
-                    </span>
-                  </div>
-
-                  {/* Day Columns */}
+              {/* Mobile/Tablet Week View - Day Cards */}
+              <div className="lg:hidden p-3 md:p-4">
+                <div className="grid gap-3 md:gap-4">
                   {weekDays.map((day, dayIndex) => {
-                    const dayEvents = getEventsForSlot(dayIndex, timeSlot);
+                    const dayEvents = events.filter(event => event.day === dayIndex);
                     
                     return (
-                      <div
-                        key={dayIndex}
-                        className="border-r p-2 cursor-pointer hover:bg-muted/50 transition-colors min-h-[80px]"
-                        onClick={() => handleCellClick(dayIndex, timeSlot)}
-                      >
-                        {dayEvents.map((event) => (
-                          <div
-                            key={event.id}
-                            className={cn(
-                              "p-2 rounded-md mb-1 cursor-pointer hover:shadow-md transition-all",
-                              event.color
-                            )}
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleEditEvent(event);
-                            }}
-                          >
-                            <div className="font-medium text-sm truncate">
-                              {event.title}
+                      <Card key={dayIndex} className={cn(
+                        "cursor-pointer hover:shadow-md transition-all",
+                        day.isToday && "ring-2 ring-primary"
+                      )}>
+                        <CardHeader className="pb-3">
+                          <div className="flex items-center justify-between">
+                            <div>
+                              <CardTitle className="text-lg">{day.name}</CardTitle>
+                              <CardDescription>{day.date}</CardDescription>
                             </div>
-                            <div className="text-xs opacity-75 truncate">
-                              {event.description}
-                            </div>
-                            <div className="text-xs opacity-75 mt-1">
-                              {event.startTime} - {event.endTime}
-                            </div>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => {
+                                setSelectedTimeSlot({ day: dayIndex, time: '09:00' });
+                                setIsDialogOpen(true);
+                              }}
+                            >
+                              <Plus className="h-4 w-4" />
+                            </Button>
                           </div>
-                        ))}
-                      </div>
+                        </CardHeader>
+                        <CardContent>
+                          {dayEvents.length === 0 ? (
+                            <p className="text-sm text-muted-foreground">No events</p>
+                          ) : (
+                            <div className="space-y-2">
+                              {dayEvents
+                                .sort((a, b) => a.startTime.localeCompare(b.startTime))
+                                .map((event) => (
+                                  <div
+                                    key={event.id}
+                                    className={cn(
+                                      "p-3 rounded-lg cursor-pointer hover:shadow-sm transition-all",
+                                      event.color
+                                    )}
+                                    onClick={() => handleEditEvent(event)}
+                                  >
+                                    <div className="font-medium text-sm truncate mb-1">
+                                      {event.title}
+                                    </div>
+                                    <div className="text-xs opacity-75 mb-2 line-clamp-2">
+                                      {event.description}
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                      <div className="text-xs opacity-75">
+                                        {event.startTime} - {event.endTime}
+                                      </div>
+                                      <Badge variant="secondary" className="text-xs">
+                                        {event.category}
+                                      </Badge>
+                                    </div>
+                                  </div>
+                                ))}
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
                     );
                   })}
                 </div>
-              ))}
-            </div>
+              </div>
+            </>
           ) : (
-            /* Single Day View */
-            <div className="p-6">
+            /* Single Day View - Mobile Optimized */
+            <div className="p-3 md:p-6">
               <div className="max-w-4xl mx-auto">
-                <div className="bg-card rounded-lg border p-6">
-                  <h2 className="text-2xl font-bold mb-6">
-                    {viewMode === 'TODAY' && 'Today\'s Events'}
-                    {viewMode === 'TOMORROW' && 'Tomorrow\'s Events'}
-                    {viewMode === 'YESTERDAY' && 'Yesterday\'s Events'}
-                  </h2>
-                  
-                  <div className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="text-xl md:text-2xl">
+                      {viewMode === 'TODAY' && 'Today\'s Events'}
+                      {viewMode === 'TOMORROW' && 'Tomorrow\'s Events'}
+                      {viewMode === 'YESTERDAY' && 'Yesterday\'s Events'}
+                    </CardTitle>
+                    <CardDescription>
+                      {selectedDate.toLocaleDateString('en-US', { 
+                        weekday: 'long', 
+                        month: 'long', 
+                        day: 'numeric', 
+                        year: 'numeric' 
+                      })}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
                     {getEventsForDate(selectedDate).length === 0 ? (
-                      <div className="text-center py-12">
+                      <div className="text-center py-8 md:py-12">
                         <CalendarDays className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                        <p className="text-muted-foreground">No events scheduled for this day</p>
+                        <p className="text-muted-foreground mb-4">No events scheduled for this day</p>
                         <Button 
                           onClick={() => {
                             setSelectedTimeSlot({ day: selectedDate.getDay(), time: '09:00' });
                             setIsDialogOpen(true);
                           }} 
-                          className="mt-4"
                         >
                           <Plus className="h-4 w-4 mr-2" />
                           Add Event
                         </Button>
                       </div>
                     ) : (
-                      getEventsForDate(selectedDate)
-                        .sort((a, b) => a.startTime.localeCompare(b.startTime))
-                        .map((event) => (
-                          <div
-                            key={event.id}
-                            className={cn(
-                              "p-4 rounded-lg cursor-pointer hover:shadow-md transition-all",
-                              event.color
-                            )}
-                            onClick={() => handleEditEvent(event)}
-                          >
-                            <div className="flex items-start justify-between">
-                              <div className="flex-1">
-                                <div className="font-semibold text-lg mb-1">{event.title}</div>
-                                <div className="text-sm opacity-75 mb-2">{event.description}</div>
-                                <div className="flex items-center gap-4 text-sm opacity-75">
-                                  <div className="flex items-center gap-1">
-                                    <Clock className="h-4 w-4" />
-                                    {event.startTime} - {event.endTime}
+                      <div className="space-y-3 md:space-y-4">
+                        {getEventsForDate(selectedDate)
+                          .sort((a, b) => a.startTime.localeCompare(b.startTime))
+                          .map((event) => (
+                            <div
+                              key={event.id}
+                              className={cn(
+                                "p-3 md:p-4 rounded-lg cursor-pointer hover:shadow-md transition-all",
+                                event.color
+                              )}
+                              onClick={() => handleEditEvent(event)}
+                            >
+                              <div className="flex items-start justify-between gap-3">
+                                <div className="flex-1 min-w-0">
+                                  <div className="font-semibold text-base md:text-lg mb-1 truncate">{event.title}</div>
+                                  <div className="text-sm opacity-75 mb-2 line-clamp-2 md:line-clamp-none">{event.description}</div>
+                                  <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-sm opacity-75">
+                                    <div className="flex items-center gap-1">
+                                      <Clock className="h-4 w-4 flex-shrink-0" />
+                                      <span>{event.startTime} - {event.endTime}</span>
+                                    </div>
+                                    <Badge variant="secondary" className="w-fit">{event.category}</Badge>
                                   </div>
-                                  <Badge variant="secondary">{event.category}</Badge>
                                 </div>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleEditEvent(event);
+                                  }}
+                                  className="flex-shrink-0"
+                                >
+                                  <Edit className="h-4 w-4" />
+                                </Button>
                               </div>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleEditEvent(event);
-                                }}
-                              >
-                                <Edit className="h-4 w-4" />
-                              </Button>
                             </div>
-                          </div>
-                        ))
+                          ))}
+                      </div>
                     )}
-                  </div>
-                </div>
+                  </CardContent>
+                </Card>
               </div>
             </div>
           )}
         </div>
 
-        {/* Events Sidebar */}
-        <div className="w-80 border-l bg-card p-4 overflow-auto">
-          <div className="space-y-4">
-            <div>
-              <h3 className="font-semibold text-lg mb-2">
-                {viewMode === 'WEEK' && `Today • ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
-                {viewMode === 'TODAY' && `Today • ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
-                {viewMode === 'TOMORROW' && `Tomorrow • ${new Date(Date.now() + 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
-                {viewMode === 'YESTERDAY' && `Yesterday • ${new Date(Date.now() - 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
-              </h3>
-              <div className="space-y-3">
-                {(() => {
-                  const displayEvents = viewMode === 'WEEK' ? getTodayEvents() : getEventsForDate(selectedDate);
-                  return displayEvents.length === 0 ? (
-                    <p className="text-muted-foreground text-sm">No events for this day</p>
-                  ) : (
-                    displayEvents.map((event) => (
-                      <div key={event.id} className="flex items-start gap-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors">
-                        <div className="w-2 h-2 rounded-full bg-primary mt-2"></div>
+        {/* Events Sidebar - Hidden on mobile, collapsible on tablet */}
+        <div className="hidden md:block md:w-80 lg:w-80 border-l bg-card">
+          <div className="p-4 overflow-auto h-full">
+            <div className="space-y-4">
+              <div>
+                <h3 className="font-semibold text-lg mb-2">
+                  {viewMode === 'WEEK' && `Today • ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
+                  {viewMode === 'TODAY' && `Today • ${new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
+                  {viewMode === 'TOMORROW' && `Tomorrow • ${new Date(Date.now() + 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
+                  {viewMode === 'YESTERDAY' && `Yesterday • ${new Date(Date.now() - 24 * 60 * 60 * 1000).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}`}
+                </h3>
+                <div className="space-y-3">
+                  {(() => {
+                    const displayEvents = viewMode === 'WEEK' ? getTodayEvents() : getEventsForDate(selectedDate);
+                    return displayEvents.length === 0 ? (
+                      <p className="text-muted-foreground text-sm">No events for this day</p>
+                    ) : (
+                      displayEvents.map((event) => (
+                        <div key={event.id} className="flex items-start gap-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors cursor-pointer" onClick={() => handleEditEvent(event)}>
+                          <div className="w-2 h-2 rounded-full bg-primary mt-2 flex-shrink-0"></div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-medium text-sm truncate">{event.title}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {event.startTime} - {event.endTime}
+                            </div>
+                            <div className="text-xs text-muted-foreground mt-1 truncate">
+                              {event.description}
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    );
+                  })()}
+                </div>
+              </div>
+
+              {/* Upcoming Events - Only show in week view */}
+              {viewMode === 'WEEK' && (
+                <div>
+                  <h3 className="font-semibold text-lg mb-2">Upcoming</h3>
+                  <div className="space-y-3">
+                    {events.slice(0, 5).map((event) => (
+                      <div key={event.id} className="flex items-start gap-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors cursor-pointer" onClick={() => handleEditEvent(event)}>
+                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-medium flex-shrink-0">
+                          {event.title.charAt(0)}
+                        </div>
                         <div className="flex-1 min-w-0">
                           <div className="font-medium text-sm truncate">{event.title}</div>
                           <div className="text-xs text-muted-foreground">
-                            {event.startTime} - {event.endTime}
+                            {weekDays[event.day]?.name} • {event.startTime} - {event.endTime}
                           </div>
                           <div className="text-xs text-muted-foreground mt-1 truncate">
                             {event.description}
                           </div>
                         </div>
                       </div>
-                    ))
-                  );
-                })()}
-              </div>
-            </div>
-
-            {/* Upcoming Events - Only show in week view */}
-            {viewMode === 'WEEK' && (
-              <div>
-                <h3 className="font-semibold text-lg mb-2">Upcoming</h3>
-                <div className="space-y-3">
-                  {events.slice(0, 5).map((event) => (
-                    <div key={event.id} className="flex items-start gap-3 p-3 rounded-lg border hover:bg-muted/50 transition-colors">
-                      <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-medium">
-                        {event.title.charAt(0)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-sm truncate">{event.title}</div>
-                        <div className="text-xs text-muted-foreground">
-                          {weekDays[event.day]?.name} • {event.startTime} - {event.endTime}
-                        </div>
-                        <div className="text-xs text-muted-foreground mt-1 truncate">
-                          {event.description}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
+                  
+                  <Button variant="ghost" className="w-full mt-4 text-sm">
+                    View all events
+                  </Button>
                 </div>
-                
-                <Button variant="ghost" className="w-full mt-4 text-sm">
-                  8 more planned...
-                </Button>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>

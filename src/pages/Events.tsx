@@ -27,6 +27,7 @@ import {
 import { usePageLoading } from "@/hooks/use-page-loading";
 import { GenericPageSkeleton } from "@/components/ui/page-skeleton";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
@@ -49,6 +50,13 @@ interface Event {
 const Events = () => {
   const isLoading = usePageLoading();
   const { toast } = useToast();
+  const { user } = useAuth();
+
+  // Check if user can edit events (admins and teachers can, students cannot)
+  const canEditEvents = user?.role === 'admin' || user?.role === 'teacher';
+  
+  // Check if user can register for events (only students can)
+  const canRegisterForEvents = user?.role === 'student';
 
   const [searchTerm, setSearchTerm] = useState("");
   const [events, setEvents] = useState<Event[]>([
@@ -321,14 +329,21 @@ const Events = () => {
         <div className="flex items-center gap-3">
           <CalendarX className="h-8 w-8 text-primary" />
           <div>
-            <h1 className="text-3xl font-bold">Events</h1>
-            <p className="text-muted-foreground hidden md:block">Discover and join campus events</p>
+            <h1 className="mobile-heading font-bold">Events</h1>
+            <p className="text-muted-foreground mobile-hide-description">
+              {user?.role === 'student' 
+                ? 'Discover and join campus events' 
+                : 'Manage and organize campus events'
+              }
+            </p>
           </div>
         </div>
-        <Button onClick={handleAddEvent} className="flex items-center gap-2">
-          <Plus className="h-4 w-4" />
-          Create Event
-        </Button>
+        {canEditEvents && (
+          <Button onClick={handleAddEvent} className="flex items-center gap-2">
+            <Plus className="h-4 w-4" />
+            Create Event
+          </Button>
+        )}
       </div>
 
       <Card>
@@ -360,8 +375,12 @@ const Events = () => {
         </Card>
         <Card>
           <CardContent className="pt-6">
-            <div className="text-2xl font-bold text-green-600">{registeredEvents.length}</div>
-            <p className="text-xs text-muted-foreground">Registered</p>
+            <div className="text-2xl font-bold text-green-600">
+              {canRegisterForEvents ? registeredEvents.length : 'N/A'}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              {canRegisterForEvents ? 'Registered' : 'My Events'}
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -373,9 +392,14 @@ const Events = () => {
       </div>
 
       <Tabs defaultValue="upcoming" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className={cn(
+          "grid w-full",
+          canRegisterForEvents ? "grid-cols-4" : "grid-cols-3"
+        )}>
           <TabsTrigger value="upcoming">Upcoming</TabsTrigger>
-          <TabsTrigger value="registered">My Events</TabsTrigger>
+          {canRegisterForEvents && (
+            <TabsTrigger value="registered">My Events</TabsTrigger>
+          )}
           <TabsTrigger value="past">Past Events</TabsTrigger>
           <TabsTrigger value="calendar">Calendar</TabsTrigger>
         </TabsList>
@@ -384,14 +408,16 @@ const Events = () => {
           {upcomingEvents.length === 0 ? (
             <Card>
               <CardContent className="pt-6">
-                <div className="text-center py-12">
-                  <PartyPopper className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground mb-4">No upcoming events found</p>
-                  <Button onClick={handleAddEvent}>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Create Your First Event
-                  </Button>
-                </div>
+                  <div className="text-center py-12">
+                    <PartyPopper className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground mb-4">No upcoming events found</p>
+                    {canEditEvents && (
+                      <Button onClick={handleAddEvent}>
+                        <Plus className="h-4 w-4 mr-2" />
+                        Create Your First Event
+                      </Button>
+                    )}
+                  </div>
               </CardContent>
             </Card>
           ) : (
@@ -412,17 +438,21 @@ const Events = () => {
                         <Badge className={getCategoryColor(event.category)}>
                           {event.category}
                         </Badge>
-                        <Button variant="ghost" size="sm" onClick={() => handleEditEvent(event)}>
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          onClick={() => handleDeleteEvent(event.id)}
-                          className="text-destructive hover:text-destructive"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        {canEditEvents && (
+                          <>
+                            <Button variant="ghost" size="sm" onClick={() => handleEditEvent(event)}>
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={() => handleDeleteEvent(event.id)}
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </>
+                        )}
                       </div>
                     </div>
                   </CardHeader>
@@ -461,13 +491,15 @@ const Events = () => {
                     </div>
 
                     <div className="flex gap-2">
-                      <Button 
-                        size="sm" 
-                        variant={event.isRegistered ? "outline" : "default"}
-                        onClick={() => handleToggleRegistration(event.id)}
-                      >
-                        {event.isRegistered ? "Unregister" : "Register"}
-                      </Button>
+                      {canRegisterForEvents && (
+                        <Button 
+                          size="sm" 
+                          variant={event.isRegistered ? "outline" : "default"}
+                          onClick={() => handleToggleRegistration(event.id)}
+                        >
+                          {event.isRegistered ? "Unregister" : "Register"}
+                        </Button>
+                      )}
                       <Button size="sm" variant="outline">
                         Learn More
                       </Button>
@@ -483,70 +515,100 @@ const Events = () => {
         </TabsContent>
 
         <TabsContent value="registered" className="space-y-4">
-          {registeredEvents.length === 0 ? (
-            <Card>
-              <CardContent className="pt-6">
-                <div className="text-center py-12">
-                  <Star className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <p className="text-muted-foreground">No registered events</p>
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            registeredEvents.map((event) => (
-              <Card key={event.id} className="border-green-200 hover:shadow-md transition-shadow">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-1">
-                      <CardTitle className="text-lg flex items-center gap-2">
-                        {event.title}
-                        <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                      </CardTitle>
-                      <CardDescription>{event.organizer}</CardDescription>
-                    </div>
-                    <Badge className={getCategoryColor(event.category)}>
-                      {event.category}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <p className="text-sm text-muted-foreground">{event.description}</p>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-                    <div className="flex items-center gap-2">
-                      <CalendarIcon className="h-4 w-4" />
-                      <span>{formatDate(event.date)}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4" />
-                      <span>{formatTime(event.time)}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4" />
-                      <span>{event.location}</span>
-                    </div>
-                  </div>
-
-                  <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
-                    <p className="text-sm text-green-600 dark:text-green-400">
-                      ✓ You're registered for this event
-                    </p>
-                  </div>
-
-                  <div className="flex gap-2">
-                    <Button size="sm">View Details</Button>
-                    <Button size="sm" variant="outline">Add to Calendar</Button>
-                    <Button 
-                      size="sm" 
-                      variant="ghost"
-                      onClick={() => handleToggleRegistration(event.id)}
-                    >
-                      Unregister
-                    </Button>
+          {canRegisterForEvents ? (
+            registeredEvents.length === 0 ? (
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="text-center py-12">
+                    <Star className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <p className="text-muted-foreground">No registered events</p>
                   </div>
                 </CardContent>
               </Card>
-            ))
+            ) : (
+              registeredEvents.map((event) => (
+                <Card key={event.id} className="border-green-200 hover:shadow-md transition-shadow">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-start justify-between">
+                      <div className="space-y-1">
+                        <CardTitle className="text-lg flex items-center gap-2">
+                          {event.title}
+                          <Star className="h-4 w-4 text-yellow-500 fill-current" />
+                        </CardTitle>
+                        <CardDescription>{event.organizer}</CardDescription>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge className={getCategoryColor(event.category)}>
+                          {event.category}
+                        </Badge>
+                        {canEditEvents && (
+                          <>
+                            <Button variant="ghost" size="sm" onClick={() => handleEditEvent(event)}>
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              onClick={() => handleDeleteEvent(event.id)}
+                              className="text-destructive hover:text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <p className="text-sm text-muted-foreground">{event.description}</p>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                      <div className="flex items-center gap-2">
+                        <CalendarIcon className="h-4 w-4" />
+                        <span>{formatDate(event.date)}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Clock className="h-4 w-4" />
+                        <span>{formatTime(event.time)}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="h-4 w-4" />
+                        <span>{event.location}</span>
+                      </div>
+                    </div>
+
+                    <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
+                      <p className="text-sm text-green-600 dark:text-green-400">
+                        ✓ You're registered for this event
+                      </p>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <Button size="sm">View Details</Button>
+                      <Button size="sm" variant="outline">Add to Calendar</Button>
+                      <Button 
+                        size="sm" 
+                        variant="ghost"
+                        onClick={() => handleToggleRegistration(event.id)}
+                      >
+                        Unregister
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )
+          ) : (
+            <Card>
+              <CardContent className="pt-6">
+                <div className="text-center py-12">
+                  <Target className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground">
+                    {user?.role === 'teacher' ? 'As a teacher, you organize events rather than register for them.' : 'As an admin, you manage events rather than register for them.'}
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
           )}
         </TabsContent>
 
@@ -561,17 +623,34 @@ const Events = () => {
               </CardContent>
             </Card>
           ) : (
-            pastEvents.map((event) => (
-              <Card key={event.id} className="opacity-75 hover:shadow-md transition-shadow">
-                <CardHeader className="pb-3">
-                  <div className="flex items-start justify-between">
-                    <div className="space-y-1">
-                      <CardTitle className="text-lg">{event.title}</CardTitle>
-                      <CardDescription>{event.organizer}</CardDescription>
-                    </div>
-                    <Badge variant="outline">Past Event</Badge>
-                  </div>
-                </CardHeader>
+             pastEvents.map((event) => (
+               <Card key={event.id} className="opacity-75 hover:shadow-md transition-shadow">
+                 <CardHeader className="pb-3">
+                   <div className="flex items-start justify-between">
+                     <div className="space-y-1">
+                       <CardTitle className="text-lg">{event.title}</CardTitle>
+                       <CardDescription>{event.organizer}</CardDescription>
+                     </div>
+                     <div className="flex items-center gap-2">
+                       <Badge variant="outline">Past Event</Badge>
+                       {canEditEvents && (
+                         <>
+                           <Button variant="ghost" size="sm" onClick={() => handleEditEvent(event)}>
+                             <Edit className="h-4 w-4" />
+                           </Button>
+                           <Button 
+                             variant="ghost" 
+                             size="sm" 
+                             onClick={() => handleDeleteEvent(event.id)}
+                             className="text-destructive hover:text-destructive"
+                           >
+                             <Trash2 className="h-4 w-4" />
+                           </Button>
+                         </>
+                       )}
+                     </div>
+                   </div>
+                 </CardHeader>
                 <CardContent className="space-y-4">
                   <p className="text-sm text-muted-foreground">{event.description}</p>
                   
@@ -676,7 +755,8 @@ const Events = () => {
       </Tabs>
 
       {/* Add/Edit Event Dialog */}
-      <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      {canEditEvents && (
+        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
         <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
@@ -804,7 +884,8 @@ const Events = () => {
             </div>
           </div>
         </DialogContent>
-      </Dialog>
+        </Dialog>
+      )}
     </div>
   );
 };

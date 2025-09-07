@@ -18,8 +18,8 @@ const Calculators = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Calculators</h1>
-        <p className="text-muted-foreground">Essential calculators for students</p>
+        <h1 className="mobile-heading font-bold">Calculators</h1>
+        <p className="text-muted-foreground mobile-hide-description">Essential calculators for students</p>
       </div>
 
       <Tabs defaultValue="gpa" className="w-full">
@@ -38,7 +38,7 @@ const Calculators = () => {
                 <TrendingUp className="h-5 w-5" />
                 CGPA Calculator
               </CardTitle>
-              <CardDescription>Track your academic performance across all semesters</CardDescription>
+              <CardDescription className="mobile-hide-description">Track your academic performance across all semesters</CardDescription>
             </CardHeader>
             <CardContent>
               <CGPACalculator />
@@ -54,7 +54,7 @@ const Calculators = () => {
                 <DollarSign className="h-5 w-5" />
                 Student Loan Calculator
               </CardTitle>
-              <CardDescription>Calculate loan payments with detailed breakdown and visualization</CardDescription>
+              <CardDescription className="mobile-hide-description">Calculate loan payments with detailed breakdown and visualization</CardDescription>
             </CardHeader>
             <CardContent>
               <LoanCalculator />
@@ -70,7 +70,7 @@ const Calculators = () => {
                 <Percent className="h-5 w-5" />
                 Grade Calculator
               </CardTitle>
-              <CardDescription>Track assignments and calculate required final exam scores</CardDescription>
+              <CardDescription className="mobile-hide-description">Track assignments and calculate required final exam scores</CardDescription>
             </CardHeader>
             <CardContent>
               <GradeCalculator />
@@ -86,7 +86,7 @@ const Calculators = () => {
                 <Calculator className="h-5 w-5" />
                 Basic Calculator
               </CardTitle>
-              <CardDescription>Functional arithmetic calculator</CardDescription>
+              <CardDescription className="mobile-hide-description">Functional arithmetic calculator</CardDescription>
             </CardHeader>
             <CardContent>
               <BasicCalculator />

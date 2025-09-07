@@ -149,7 +149,7 @@ export function EnhancedChatMessage({
   return (
     <>
       <div className={`flex ${isOwn ? 'justify-end' : 'justify-start'} mb-4 w-full`}>
-        <div className={`flex gap-2 max-w-[85%] sm:max-w-[70%] w-full ${isOwn ? 'flex-row-reverse' : ''}`}>
+        <div className={`flex gap-2 max-w-[85%] sm:max-w-[70%] ${isOwn ? 'flex-row-reverse' : ''}`}>
           {!isOwn && (
             <Avatar className="w-6 h-6 sm:w-8 sm:h-8 flex-shrink-0">
               <AvatarFallback className="text-xs">
@@ -158,7 +158,7 @@ export function EnhancedChatMessage({
             </Avatar>
           )}
           
-          <div className={`rounded-lg p-2 sm:p-3 min-w-0 flex-1 ${
+          <div className={`rounded-lg p-2 sm:p-3 min-w-0 max-w-fit ${
             isOwn 
               ? 'bg-primary text-primary-foreground' 
               : 'bg-muted'

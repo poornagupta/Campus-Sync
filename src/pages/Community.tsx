@@ -1,28 +1,33 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState, useEffect } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Users, MessageCircle, Calendar, Plus, Share2, Search, Send, ArrowLeft, Paperclip, MoreVertical } from "lucide-react";
+import { Users, MessageCircle, Calendar, ArrowLeft, Search, Share2, MoreVertical, Plus, Paperclip, Send } from "lucide-react";
 import { usePageLoading } from "@/hooks/use-page-loading";
 import { GenericPageSkeleton } from "@/components/ui/page-skeleton";
+import { useToast } from "@/hooks/use-toast";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useState } from "react";
+import { GroupCard } from "@/components/community/GroupCard";
+import { ChatInterface } from "@/components/community/ChatInterface";
+import { CreateGroupDialog } from "@/components/community/CreateGroupDialog";
 import { GroupDetailsDialog } from "@/components/community/GroupDetailsDialog";
 import { MediaShareDialog } from "@/components/community/MediaShareDialog";
 import { GroupSettingsDialog } from "@/components/community/GroupSettingsDialog";
 import { EnhancedChatMessage } from "@/components/community/EnhancedChatMessage";
-import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Community = () => {
   const isLoading = usePageLoading();
   const isMobile = useIsMobile();
   const { toast } = useToast();
+  const { user } = useAuth();
   
   const [selectedSemester, setSelectedSemester] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
@@ -35,6 +40,27 @@ const Community = () => {
   const [showGroupDetails, setShowGroupDetails] = useState(false);
   const [showMediaShare, setShowMediaShare] = useState(false);
   const [showGroupSettings, setShowGroupSettings] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [joinedGroups, setJoinedGroups] = useState<Set<string>>(new Set(['1'])); // User starts joined to group 1
+
+  useEffect(() => {
+    const handleViewportChange = () => {
+      if (!window.visualViewport) return;
+      const vv = window.visualViewport;
+      const overlap = Math.max(0, window.innerHeight - (vv.height + vv.offsetTop));
+      setKeyboardHeight(overlap > 80 ? overlap : 0);
+    };
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleViewportChange);
+      window.visualViewport.addEventListener('scroll', handleViewportChange);
+      handleViewportChange();
+      return () => {
+        window.visualViewport?.removeEventListener('resize', handleViewportChange);
+        window.visualViewport?.removeEventListener('scroll', handleViewportChange);
+      };
+    }
+  }, []);
 
   const semesters = [
     "Semester 1", "Semester 2", "Semester 3", "Semester 4", 
@@ -53,7 +79,9 @@ const Community = () => {
       lastMessage: "Hey everyone! Anyone solved the algorithm assignment?",
       lastMessageTime: "10:40 AM",
       createdAt: "2024-01-15",
-      icon: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?w=400&h=400&fit=crop&crop=face"
+      icon: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?w=400&h=400&fit=crop&crop=face",
+      targetAudience: "student",
+      createdBy: "admin"
     },
     { 
       id: "2",
@@ -66,7 +94,9 @@ const Community = () => {
       lastMessage: "Thanks for the calculus notes!",
       lastMessageTime: "Yesterday",
       createdAt: "2024-01-10",
-      icon: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=400&fit=crop&crop=face"
+      icon: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=400&fit=crop&crop=face",
+      targetAudience: "student",
+      createdBy: "teacher"
     },
     { 
       id: "3",
@@ -79,7 +109,9 @@ const Community = () => {
       lastMessage: "Lab report submission deadline is tomorrow",
       lastMessageTime: "2:15 PM",
       createdAt: "2024-01-20",
-      icon: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=400&h=400&fit=crop&crop=face"
+      icon: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=400&h=400&fit=crop&crop=face",
+      targetAudience: "student",
+      createdBy: "admin"
     },
     { 
       id: "4",
@@ -92,11 +124,73 @@ const Community = () => {
       lastMessage: "Can someone explain projection methods?",
       lastMessageTime: "9:30 AM",
       createdAt: "2024-01-05",
-      icon: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=400&h=400&fit=crop&crop=face"
+      icon: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=400&h=400&fit=crop&crop=face",
+      targetAudience: "student",
+      createdBy: "teacher"
+    },
+    { 
+      id: "5",
+      name: "Faculty Meeting - Q1", 
+      members: 8, 
+      active: true, 
+      semester: "All",
+      description: "Quarterly faculty coordination meeting",
+      link: "https://community.com/faculty-q1",
+      lastMessage: "Next meeting agenda uploaded",
+      lastMessageTime: "11:30 AM",
+      createdAt: "2024-01-25",
+      icon: "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=400&h=400&fit=crop&crop=face",
+      targetAudience: "admin-teacher",
+      createdBy: "admin"
+    },
+    { 
+      id: "6",
+      name: "Department Heads Discussion", 
+      members: 5, 
+      active: true, 
+      semester: "All",
+      description: "Department coordination and planning",
+      link: "https://community.com/dept-heads",
+      lastMessage: "Budget planning for next semester",
+      lastMessageTime: "Yesterday",
+      createdAt: "2024-01-20",
+      icon: "https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=400&h=400&fit=crop&crop=face",
+      targetAudience: "admin-teacher",
+      createdBy: "admin"
+    },
+    { 
+      id: "7",
+      name: "Administrative Team", 
+      members: 3, 
+      active: true, 
+      semester: "All",
+      description: "Internal admin coordination and policy discussions",
+      link: "https://community.com/admin-team",
+      lastMessage: "New policy draft ready for review",
+      lastMessageTime: "2 hours ago",
+      createdAt: "2024-01-15",
+      icon: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face",
+      targetAudience: "admin",
+      createdBy: "admin"
+    },
+    { 
+      id: "8",
+      name: "Academic Excellence Program", 
+      members: 42, 
+      active: true, 
+      semester: "All",
+      description: "Collaborative space for teachers and top-performing students",
+      link: "https://community.com/academic-excellence",
+      lastMessage: "Research project proposals due next week",
+      lastMessageTime: "1 hour ago",
+      createdAt: "2024-01-18",
+      icon: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=400&h=400&fit=crop&crop=face",
+      targetAudience: "teacher-student",
+      createdBy: "admin"
     }
   ];
 
-  const messages = [
+  const [messages, setMessages] = useState([
     { 
       id: "1", 
       groupId: "1", 
@@ -172,28 +266,72 @@ const Community = () => {
       readCount: 30,
       totalMembers: 45
     }
-  ];
+  ]);
 
   const filteredGroups = groups.filter(group => {
     const matchesSemester = selectedSemester === "all" || group.semester === selectedSemester;
     const matchesSearch = group.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
                          group.description.toLowerCase().includes(searchQuery.toLowerCase());
+    
+    // Role-based filtering
+    const userRole = user?.role || 'student';
+    if (userRole === 'student') {
+      // Students can see student groups and teacher-student combined groups
+      return matchesSemester && matchesSearch && 
+             (group.targetAudience === 'student' || 
+              group.targetAudience === 'teacher-student');
+    } else if (userRole === 'teacher') {
+      // Teachers can see student groups, teacher-only groups, admin-teacher groups, and teacher-student groups
+      return matchesSemester && matchesSearch && 
+             (group.targetAudience === 'student' || 
+              group.targetAudience === 'teacher' || 
+              group.targetAudience === 'admin-teacher' ||
+              group.targetAudience === 'teacher-student');
+    } else if (userRole === 'admin') {
+      // Admins can see all groups
+      return matchesSemester && matchesSearch;
+    }
+    
     return matchesSemester && matchesSearch;
   });
 
-  const handleCreateGroup = () => {
+  const handleCreateGroup = (groupData: {
+    name: string;
+    description: string;
+    semester: string;
+    targetAudience: string;
+  }) => {
     // In a real app, this would create the group via API
-    console.log("Creating group:", { newGroupName, newGroupDescription, newGroupSemester });
-    setNewGroupName("");
-    setNewGroupDescription("");
-    setNewGroupSemester("");
+    console.log("Creating group:", groupData);
+    toast({
+      title: "Group created!",
+      description: `Successfully created ${groupData.name} for ${groupData.targetAudience}s.`,
+    });
   };
 
   const handleSendMessage = () => {
     if (newMessage.trim() && activeChat) {
-      // In a real app, this would send the message via API
-      console.log("Sending message:", newMessage, "to group:", activeChat);
+      const currentTime = new Date().toLocaleTimeString([], { 
+        hour: '2-digit', 
+        minute: '2-digit' 
+      });
+      
+      const newMessageObj = {
+        id: `user-${Date.now()}`,
+        groupId: activeChat,
+        type: "text" as const,
+        sender: "You",
+        message: newMessage.trim(),
+        time: currentTime,
+        avatar: "YU",
+        readCount: 0,
+        totalMembers: groups.find(g => g.id === activeChat)?.members || 0
+      };
+      
+      setMessages(prev => [...prev, newMessageObj]);
       setNewMessage("");
+      
+      console.log("Message sent:", newMessageObj);
     }
   };
 
@@ -246,12 +384,33 @@ const Community = () => {
   };
 
   const handleJoinChat = (groupId: string) => {
+    if (!joinedGroups.has(groupId)) {
+      setJoinedGroups(prev => new Set([...prev, groupId]));
+      toast({
+        title: "Joined group!",
+        description: "You have successfully joined the study group.",
+      });
+    }
     setActiveChat(groupId);
     setChatMode(true);
     // Reset dialog states when entering chat mode
     setShowGroupDetails(false);
     setShowMediaShare(false);
     setShowGroupSettings(false);
+  };
+
+  const handleLeaveGroup = (groupId: string) => {
+    setJoinedGroups(prev => {
+      const newSet = new Set(prev);
+      newSet.delete(groupId);
+      return newSet;
+    });
+    setActiveChat(null);
+    setChatMode(false);
+    toast({
+      title: "Left group",
+      description: "You have left the study group.",
+    });
   };
 
   const handleBackToMain = () => {
@@ -270,7 +429,7 @@ const Community = () => {
   if (chatMode) {
     // WhatsApp-style chat interface
     return (
-      <div className="h-[calc(100vh-8rem)] flex flex-col md:flex-row overflow-hidden">
+      <div className={`${isMobile ? 'fixed inset-0 h-screen' : 'h-[calc(100vh-8rem)]'} flex flex-col md:flex-row overflow-hidden`}>
         {/* Left Panel - Groups List */}
         <div className={`${isMobile ? 'w-full' : 'w-1/3'} border-r bg-background flex flex-col`}>
           {/* Header */}
@@ -299,7 +458,7 @@ const Community = () => {
           {/* Groups List */}
           <ScrollArea className="flex-1">
             <div className="space-y-1">
-              {filteredGroups.map((group) => (
+              {filteredGroups.filter(group => joinedGroups.has(group.id)).map((group) => (
                 <div
                   key={group.id}
                   className={`p-4 cursor-pointer hover:bg-muted/50 border-b ${
@@ -388,23 +547,30 @@ const Community = () => {
                          </p>
                        </div>
                      </div>
-                    <div className="flex gap-2">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => copyGroupLink(groups.find(g => g.id === activeChat)?.link || "")}
-                      >
-                        <Share2 className="h-4 w-4 mr-1" />
-                        Share
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        size="sm"
-                        onClick={() => setShowGroupSettings(true)}
-                      >
-                        <MoreVertical className="h-4 w-4" />
-                      </Button>
-                    </div>
+                     <div className="flex gap-2">
+                       <Button 
+                         variant="outline" 
+                         size="sm"
+                         onClick={() => copyGroupLink(groups.find(g => g.id === activeChat)?.link || "")}
+                       >
+                         <Share2 className="h-4 w-4 mr-1" />
+                         Share
+                       </Button>
+                       <Button 
+                         variant="outline" 
+                         size="sm"
+                         onClick={() => handleLeaveGroup(activeChat)}
+                       >
+                         Leave Group
+                       </Button>
+                       <Button 
+                         variant="ghost" 
+                         size="sm"
+                         onClick={() => setShowGroupSettings(true)}
+                       >
+                         <MoreVertical className="h-4 w-4" />
+                       </Button>
+                     </div>
                   </div>
                 </div>
 
@@ -463,12 +629,12 @@ const Community = () => {
           </div>
         )}
 
-        {/* Mobile Chat View */}
+        {/* Mobile Chat View - Fixed layout with consistent heights */}
         {isMobile && activeChat && (
-          <div className="absolute inset-0 bg-background z-50 flex flex-col">
-            {/* Chat Header */}
-            <div className="p-3 border-b bg-background flex-shrink-0">
-              <div className="flex items-center gap-2">
+          <div className="fixed inset-0 bg-background z-50 flex flex-col h-screen">
+            {/* Chat Header - Fixed height */}
+            <div className="flex-shrink-0 border-b bg-background">
+              <div className="flex items-center gap-2 p-3 h-16">
                 <Button variant="ghost" size="sm" onClick={() => setActiveChat(null)} className="flex-shrink-0">
                   <ArrowLeft className="h-4 w-4" />
                 </Button>
@@ -476,7 +642,7 @@ const Community = () => {
                    <img 
                      src={groups.find(g => g.id === activeChat)?.icon} 
                      alt={`${groups.find(g => g.id === activeChat)?.name} icon`}
-                     className="w-7 h-7 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity flex-shrink-0"
+                     className="w-8 h-8 rounded-full object-cover cursor-pointer hover:opacity-80 transition-opacity flex-shrink-0"
                      onClick={(e) => {
                        e.stopPropagation();
                        setShowGroupDetails(true);
@@ -484,13 +650,13 @@ const Community = () => {
                    />
                  ) : (
                    <div 
-                     className="w-7 h-7 rounded-full bg-primary/10 flex items-center justify-center cursor-pointer hover:bg-primary/20 transition-colors flex-shrink-0"
+                     className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center cursor-pointer hover:bg-primary/20 transition-colors flex-shrink-0"
                      onClick={(e) => {
                        e.stopPropagation();
                        setShowGroupDetails(true);
                      }}
                    >
-                     <Users className="h-3 w-3 text-primary" />
+                     <Users className="h-4 w-4 text-primary" />
                    </div>
                  )}
                 <div className="flex-1 min-w-0">
@@ -499,21 +665,31 @@ const Community = () => {
                     {groups.find(g => g.id === activeChat)?.members} members
                   </p>
                 </div>
-                <Button 
-                  variant="outline" 
-                  size="sm"
-                  onClick={() => copyGroupLink(groups.find(g => g.id === activeChat)?.link || "")}
-                  className="flex-shrink-0 px-2"
-                >
-                  <Share2 className="h-3 w-3" />
-                </Button>
+                <div className="flex gap-1">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => copyGroupLink(groups.find(g => g.id === activeChat)?.link || "")}
+                    className="flex-shrink-0 px-2"
+                  >
+                    <Share2 className="h-3 w-3" />
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={() => handleLeaveGroup(activeChat)}
+                    className="flex-shrink-0 px-2 text-xs"
+                  >
+                    Leave
+                  </Button>
+                </div>
               </div>
             </div>
 
-            {/* Messages Area */}
-            <div className="flex-1 overflow-hidden">
+            {/* Messages Area - Takes remaining space above input */}
+            <div className="flex-1 overflow-hidden pb-20">
               <ScrollArea className="h-full">
-                <div className="p-3 space-y-2">
+                <div className="p-3 space-y-2 pb-4">
                   {messages.filter(m => m.groupId === activeChat).map((message) => (
                     <EnhancedChatMessage
                       key={message.id}
@@ -532,8 +708,14 @@ const Community = () => {
               </ScrollArea>
             </div>
 
-            {/* Message Input */}
-            <div className="p-3 border-t bg-background flex-shrink-0 safe-area-bottom">
+            {/* Message Input - Fixed at bottom like Ask AI */}
+            <div 
+              className="fixed bottom-0 left-0 right-0 border-t bg-background/95 backdrop-blur-sm p-4 z-50"
+              style={{ 
+                bottom: keyboardHeight > 0 ? `${keyboardHeight}px` : '0px',
+                transition: 'bottom 0.2s ease-out'
+              }}
+            >
               <div className="flex gap-2">
                 <Button
                   variant="ghost"
@@ -548,7 +730,8 @@ const Community = () => {
                   value={newMessage}
                   onChange={(e) => setNewMessage(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-                  className="flex-1"
+                  className="flex-1 text-base md:text-sm"
+                  style={{ fontSize: '16px' }}
                 />
                 <Button onClick={handleSendMessage} className="flex-shrink-0">
                   <Send className="h-4 w-4" />
@@ -589,61 +772,21 @@ const Community = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Community</h1>
-          <p className="text-muted-foreground">Connect with fellow students by semester</p>
+          <h1 className="mobile-heading font-bold">Community</h1>
+          <p className="text-muted-foreground mobile-hide-description">Connect and collaborate with students, teachers, and administrators</p>
         </div>
         <div className="flex gap-2">
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Create Group
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Create New Study Group</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="groupName">Group Name</Label>
-                  <Input
-                    id="groupName"
-                    placeholder="e.g., Computer Science - Sem 3"
-                    value={newGroupName}
-                    onChange={(e) => setNewGroupName(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="groupDescription">Description</Label>
-                  <Textarea
-                    id="groupDescription"
-                    placeholder="Describe what this group is for..."
-                    value={newGroupDescription}
-                    onChange={(e) => setNewGroupDescription(e.target.value)}
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="groupSemester">Semester</Label>
-                  <Select value={newGroupSemester} onValueChange={setNewGroupSemester}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select semester" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {semesters.map((semester) => (
-                        <SelectItem key={semester} value={semester}>
-                          {semester}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <Button onClick={handleCreateGroup} className="w-full">
-                  Create Group
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
+          {(user?.role === 'admin' || user?.role === 'teacher') && (
+            <CreateGroupDialog 
+              onCreateGroup={handleCreateGroup}
+              userRole={user?.role || 'student'}
+            />
+          )}
+          {user?.role === 'student' && (
+            <p className="text-sm text-muted-foreground mt-2">
+              Only teachers and admins can create groups. You can join existing groups below.
+            </p>
+          )}
         </div>
       </div>
 
@@ -753,12 +896,22 @@ const Community = () => {
                         <Share2 className="h-4 w-4 mr-1" />
                         Share
                       </Button>
-                      <Button 
-                        size="sm"
-                        onClick={() => handleJoinChat(group.id)}
-                      >
-                        Join & Chat
-                      </Button>
+                      {joinedGroups.has(group.id) ? (
+                        <Button 
+                          size="sm"
+                          variant="secondary"
+                          onClick={() => handleJoinChat(group.id)}
+                        >
+                          Open Chat
+                        </Button>
+                      ) : (
+                        <Button 
+                          size="sm"
+                          onClick={() => handleJoinChat(group.id)}
+                        >
+                          Join & Chat
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </CardContent>

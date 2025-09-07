@@ -15,20 +15,44 @@ export function ThemeToggle() {
     
     // Create overlay that completely hides content
     const overlay = document.createElement('div')
+    
+    // Prevent body scroll and get dimensions
+    const originalBodyStyle = {
+      overflow: document.body.style.overflow,
+      position: document.body.style.position,
+      width: document.body.style.width,
+      height: document.body.style.height
+    }
+    
+    // Lock body and get real dimensions
+    document.body.style.overflow = 'hidden'
+    document.body.style.position = 'fixed'
+    document.body.style.width = '100%'
+    document.body.style.height = '100%'
+    
+    // Get actual viewport dimensions
+    const viewportWidth = Math.max(window.innerWidth, document.documentElement.clientWidth)
+    const viewportHeight = Math.max(window.innerHeight, document.documentElement.clientHeight)
+    
     overlay.style.cssText = `
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: ${theme === "light" ? "#000000" : "#ffffff"};
-      z-index: 999999;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.3s ease-out;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
+      width: ${viewportWidth}px !important;
+      height: ${viewportHeight}px !important;
+      background: ${theme === "light" ? "#000000" : "#ffffff"} !important;
+      z-index: 2147483647 !important;
+      pointer-events: none !important;
+      opacity: 0 !important;
+      transition: opacity 0.3s ease-out !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      overflow: hidden !important;
+      margin: 0 !important;
+      padding: 0 !important;
+      border: none !important;
+      box-sizing: border-box !important;
     `
     
     // Create loader spinner
@@ -77,6 +101,11 @@ export function ThemeToggle() {
           if (document.body.contains(overlay)) {
             document.body.removeChild(overlay)
           }
+          // Restore body styles
+          document.body.style.overflow = originalBodyStyle.overflow
+          document.body.style.position = originalBodyStyle.position
+          document.body.style.width = originalBodyStyle.width
+          document.body.style.height = originalBodyStyle.height
         }, 300)
       }, 150)
     }, 300)

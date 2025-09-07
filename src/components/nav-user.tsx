@@ -7,6 +7,10 @@ import {
   Sparkles,
   FileText,
   User,
+  Users,
+  Upload,
+  IdCard,
+  UserCog,
 } from "lucide-react"
 
 import {
@@ -30,6 +34,8 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar"
 import { useNavigate } from "react-router-dom"
+import { useAuth } from "@/contexts/AuthContext"
+import { useUserData } from "@/hooks/useUserData"
 
 export function NavUser({
   user,
@@ -42,6 +48,13 @@ export function NavUser({
 }) {
   const { isMobile } = useSidebar()
   const navigate = useNavigate()
+  const { logout, user: authUser } = useAuth()
+  const { userData } = useUserData()
+
+  const handleLogout = () => {
+    logout()
+    navigate('/login')
+  }
 
   return (
     <SidebarMenu>
@@ -53,12 +66,14 @@ export function NavUser({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className="rounded-lg">JS</AvatarFallback>
+                <AvatarImage src={userData.avatar || user.avatar} alt={userData.name || user.name} />
+                <AvatarFallback className="rounded-lg">
+                  {(userData.name || user.name) ? (userData.name || user.name).split(' ').map(n => n[0]).join('').toUpperCase() : <User className="h-4 w-4" />}
+                </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold">{user.name}</span>
-                <span className="truncate text-xs">{user.email}</span>
+                <span className="truncate font-semibold">{userData.name || user.name || "Set your name"}</span>
+                <span className="truncate text-xs">{userData.email || user.email || "Set your email"}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -72,45 +87,59 @@ export function NavUser({
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className="rounded-lg">JS</AvatarFallback>
+                  <AvatarImage src={userData.avatar || user.avatar} alt={userData.name || user.name} />
+                  <AvatarFallback className="rounded-lg">
+                    {(userData.name || user.name) ? (userData.name || user.name).split(' ').map(n => n[0]).join('').toUpperCase() : <User className="h-4 w-4" />}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-semibold">{user.name}</span>
-                  <span className="truncate text-xs">{user.email}</span>
+                  <span className="truncate font-semibold">{userData.name || user.name || "Set your name"}</span>
+                  <span className="truncate text-xs">{userData.email || user.email || "Set your email"}</span>
                 </div>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem onClick={() => navigate('/student-profile')}>
-                <User />
-                Student Profile
-                <ChevronRight className="ml-auto h-4 w-4" />
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/academic-progress')}>
-                <Sparkles />
-                Academic Progress
-                <ChevronRight className="ml-auto h-4 w-4" />
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/view-marks')}>
-                <FileText />
-                View Marks
-                <ChevronRight className="ml-auto h-4 w-4" />
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/student-id')}>
-                <BadgeCheck />
-                Student ID
-                <ChevronRight className="ml-auto h-4 w-4" />
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate('/billing-payments')}>
-                <CreditCard />
-                Billing & Payments
-                <ChevronRight className="ml-auto h-4 w-4" />
-              </DropdownMenuItem>
+              {(() => {
+                const role = authUser?.role
+
+                const studentItems = [
+                  { to: '/student-profile', label: 'Student Profile', icon: User },
+                  { to: '/academic-progress', label: 'Academic Progress', icon: Sparkles },
+                  { to: '/view-marks', label: 'View Marks', icon: FileText },
+                  { to: '/student-id', label: 'Student ID', icon: BadgeCheck },
+                  { to: '/billing-payments', label: 'Billing & Payments', icon: CreditCard },
+                ] as const
+
+                const teacherItems = [
+                  { to: '/teacher/profile', label: 'Teacher Profile', icon: User },
+                  { to: '/teacher/students-details', label: 'Students Details', icon: Users },
+                  { to: '/teacher/upload-marks', label: 'Upload Marks', icon: Upload },
+                  { to: '/teacher/id', label: 'Teacher ID', icon: IdCard },
+                  { to: '/teacher/billing', label: 'Billing & Payments', icon: CreditCard },
+                ] as const
+
+                const adminItems = [
+                  { to: '/admin/profile', label: 'Admin Profile', icon: UserCog },
+                  { to: '/admin/manage-students', label: 'Manage Students', icon: Users },
+                  { to: '/admin/manage-teachers', label: 'Manage Teachers', icon: Users },
+                  { to: '/admin/id', label: 'Admin ID', icon: IdCard },
+                  { to: '/admin/billing', label: 'Billing & Payments', icon: CreditCard },
+                ] as const
+
+                const items = role === 'teacher' ? teacherItems : role === 'admin' ? adminItems : studentItems
+
+                return items.map((item) => (
+                  <DropdownMenuItem key={item.to} onClick={() => navigate(item.to)}>
+                    <item.icon />
+                    {item.label}
+                    <ChevronRight className="ml-auto h-4 w-4" />
+                  </DropdownMenuItem>
+                ))
+              })()}
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOut />
               Log out
             </DropdownMenuItem>

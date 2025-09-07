@@ -1,16 +1,19 @@
 import { usePageLoading } from "@/hooks/use-page-loading"
 import { IndexSkeleton } from "@/components/ui/page-skeleton"
 import { SEO } from "@/components/SEO"
+import { useAuth } from "@/contexts/AuthContext"
 import { DashboardStats } from "@/components/dashboard/DashboardStats"
 import { AcademicOverview } from "@/components/dashboard/AcademicOverview"
 import { ExpenseOverview } from "@/components/dashboard/ExpenseOverview"
 import { AnalyticsOverview } from "@/components/dashboard/AnalyticsOverview"
 import { QuickActions } from "@/components/dashboard/QuickActions"
+import { StudentInfo } from "@/components/dashboard/StudentInfo"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { GraduationCap, TrendingUp, DollarSign, Zap } from "lucide-react"
 
 const Index = () => {
   const isLoading = usePageLoading()
+  const { user } = useAuth()
 
   if (isLoading) {
     return <IndexSkeleton />
@@ -28,7 +31,7 @@ const Index = () => {
         <div className="space-y-3 text-center md:text-left">
           <div className="space-y-1">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-black dark:text-white">
-              Welcome back, John! 👋
+              Welcome back, {user?.name || 'Student'}! 👋
             </h1>
           </div>
         </div>
@@ -73,6 +76,9 @@ const Index = () => {
             <AnalyticsOverview />
           </TabsContent>
         </Tabs>
+
+        {/* Student Info Section */}
+        <StudentInfo />
       </div>
     </>
   );

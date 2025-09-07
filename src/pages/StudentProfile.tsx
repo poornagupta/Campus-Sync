@@ -6,34 +6,24 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { usePageLoading } from "@/hooks/use-page-loading"
 import { ProfileSkeleton } from "@/components/ui/profile-skeleton"
-import { GraduationCap, MapPin, Calendar, Phone, Mail, Edit } from "lucide-react"
+import { GraduationCap, MapPin, Calendar, Phone, Mail, Edit, User } from "lucide-react"
 import { EditProfileDialog } from "@/components/profile/EditProfileDialog"
 import { useToast } from "@/hooks/use-toast"
+import { useUserData } from "@/hooks/useUserData"
 
 export default function StudentProfile() {
   const isLoading = usePageLoading()
   const { toast } = useToast()
   const navigate = useNavigate()
   const [editDialogOpen, setEditDialogOpen] = useState(false)
+  const { userData, updateUserData } = useUserData()
 
-  const [student, setStudent] = useState({
-    name: "John Student",
-    email: "john@university.edu",
-    phone: "+1 (555) 123-4567",
-    studentId: "STU-2024-001",
-    course: "Computer Science Engineering",
-    year: "3rd Year",
-    semester: "6th Semester",
-    cgpa: "8.65",
-    avatar: "/placeholder.svg",
-    address: "123 University Street, Campus City, ST 12345",
-    enrollmentDate: "August 2022",
-    expectedGraduation: "May 2026",
-    status: "Active"
-  })
-
-  const handleProfileUpdate = (updatedStudent: any) => {
-    setStudent(updatedStudent)
+  const handleProfileUpdate = (updatedData: any) => {
+    updateUserData(updatedData)
+    toast({
+      title: "Profile Updated",
+      description: "Your profile has been updated successfully."
+    })
   }
 
   const handleQuickAction = (action: string) => {
@@ -62,7 +52,7 @@ export default function StudentProfile() {
         // Simulate advisor contact
         setTimeout(() => {
           const advisorEmail = "advisor@university.edu"
-          window.open(`mailto:${advisorEmail}?subject=Student Inquiry - ${student.studentId}`)
+          window.open(`mailto:${advisorEmail}?subject=Student Inquiry - ${userData.studentId}`)
         }, 1000)
         break
       case "update":
@@ -81,8 +71,8 @@ export default function StudentProfile() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Student Profile</h1>
-          <p className="text-muted-foreground text-sm sm:text-base hidden sm:block">
+          <h1 className="mobile-heading-large font-bold tracking-tight">Student Profile</h1>
+          <p className="text-muted-foreground text-sm sm:text-base mobile-hide-description">
             View and manage your academic profile information
           </p>
         </div>
@@ -97,32 +87,47 @@ export default function StudentProfile() {
         {/* Profile Overview */}
         <Card className="lg:col-span-1">
           <CardHeader className="text-center">
-            <Avatar className="h-20 w-20 sm:h-24 sm:w-24 mx-auto mb-4">
-              <AvatarImage src={student.avatar} alt={student.name} />
-              <AvatarFallback className="text-lg">JS</AvatarFallback>
-            </Avatar>
-            <CardTitle className="text-lg sm:text-xl">{student.name}</CardTitle>
-            <CardDescription>
-              <Badge variant="secondary" className="mt-2">{student.status}</Badge>
-            </CardDescription>
+           <Avatar className="h-20 w-20 sm:h-24 sm:w-24 mx-auto mb-4">
+             <AvatarImage src={userData.avatar} alt={userData.name || "User"} />
+             <AvatarFallback className="text-lg">
+               {userData.name ? userData.name.split(' ').map(n => n[0]).join('').toUpperCase() : <User className="h-8 w-8" />}
+             </AvatarFallback>
+           </Avatar>
+           <CardTitle className="text-lg sm:text-xl">{userData.name || "Please set your name"}</CardTitle>
+          <CardDescription className="mt-2">
+            {userData.status && (
+              <Badge variant="secondary">{userData.status}</Badge>
+            )}
+            {!userData.status && (
+              <span className="text-muted-foreground">Status not set</span>
+            )}
+          </CardDescription>
           </CardHeader>
           <CardContent className="space-y-3">
-            <div className="flex items-center gap-2 text-sm">
-              <GraduationCap className="h-4 w-4 text-muted-foreground" />
-              <span className="text-xs sm:text-sm">{student.studentId}</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm">
-              <Mail className="h-4 w-4 text-muted-foreground" />
-              <span className="text-xs sm:text-sm break-all">{student.email}</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm">
-              <Phone className="h-4 w-4 text-muted-foreground" />
-              <span className="text-xs sm:text-sm">{student.phone}</span>
-            </div>
-            <div className="flex items-start gap-2 text-sm">
-              <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
-              <span className="text-xs sm:text-sm">{student.address}</span>
-            </div>
+          <div className="flex items-center gap-2 text-sm">
+            <GraduationCap className="h-4 w-4 text-muted-foreground" />
+            <span className="text-xs sm:text-sm">
+              {userData.studentId || <span className="text-muted-foreground italic">Student ID not set</span>}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <Mail className="h-4 w-4 text-muted-foreground" />
+            <span className="text-xs sm:text-sm break-all">
+              {userData.email || <span className="text-muted-foreground italic">Email not set</span>}
+            </span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <Phone className="h-4 w-4 text-muted-foreground" />
+            <span className="text-xs sm:text-sm">
+              {userData.phone || <span className="text-muted-foreground italic">Phone not set</span>}
+            </span>
+          </div>
+          <div className="flex items-start gap-2 text-sm">
+            <MapPin className="h-4 w-4 text-muted-foreground mt-0.5" />
+            <span className="text-xs sm:text-sm">
+              {userData.address || <span className="text-muted-foreground italic">Address not set</span>}
+            </span>
+          </div>
           </CardContent>
         </Card>
 
@@ -136,32 +141,38 @@ export default function StudentProfile() {
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
                 <label className="text-xs font-medium text-muted-foreground">Course</label>
-                <p className="font-medium text-sm">{student.course}</p>
+                <p className="font-medium text-sm">{userData.course || <span className="text-muted-foreground italic">Not set</span>}</p>
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-medium text-muted-foreground">Current Year</label>
-                <p className="font-medium text-sm">{student.year}</p>
+                <p className="font-medium text-sm">{userData.year || <span className="text-muted-foreground italic">Not set</span>}</p>
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-medium text-muted-foreground">Current Semester</label>
-                <p className="font-medium text-sm">{student.semester}</p>
+                <p className="font-medium text-sm">{userData.semester || <span className="text-muted-foreground italic">Not set</span>}</p>
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-medium text-muted-foreground">CGPA</label>
-                <p className="font-medium text-primary text-sm">{student.cgpa}/10.0</p>
+                <p className="font-medium text-primary text-sm">
+                  {userData.cgpa ? `${userData.cgpa}/10.0` : <span className="text-muted-foreground italic">Not set</span>}
+                </p>
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-medium text-muted-foreground">Enrollment Date</label>
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <p className="font-medium text-sm">{student.enrollmentDate}</p>
+                  <p className="font-medium text-sm">
+                    {userData.enrollmentDate || <span className="text-muted-foreground italic">Not set</span>}
+                  </p>
                 </div>
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-medium text-muted-foreground">Expected Graduation</label>
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4 text-muted-foreground" />
-                  <p className="font-medium text-sm">{student.expectedGraduation}</p>
+                  <p className="font-medium text-sm">
+                    {userData.expectedGraduation || <span className="text-muted-foreground italic">Not set</span>}
+                  </p>
                 </div>
               </div>
             </div>
@@ -216,7 +227,7 @@ export default function StudentProfile() {
       <EditProfileDialog
         open={editDialogOpen}
         onOpenChange={setEditDialogOpen}
-        student={student}
+        student={userData}
         onSave={handleProfileUpdate}
       />
     </div>

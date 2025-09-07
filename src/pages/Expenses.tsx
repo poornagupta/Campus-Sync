@@ -274,8 +274,7 @@ const Expenses = () => {
       <div className="flex flex-col space-y-4">
         <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center space-y-4 lg:space-y-0">
           <div>
-            <h1 className="text-3xl font-bold tracking-tight">💰 Smart Expense Tracker</h1>
-            <p className="text-muted-foreground">AI-powered financial insights for better spending</p>
+            <h1 className="mobile-heading font-bold tracking-tight">Smart Expense Tracker</h1>
           </div>
           <div className="flex items-center gap-2">
             <AddExpenseDialog onAddTransaction={handleAddTransaction} />

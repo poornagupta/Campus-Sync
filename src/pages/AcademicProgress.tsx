@@ -46,8 +46,8 @@ export default function AcademicProgress() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Academic Progress</h1>
-          <p className="text-muted-foreground text-sm sm:text-base hidden sm:block">
+          <h1 className="mobile-heading-large font-bold tracking-tight">Academic Progress</h1>
+          <p className="text-muted-foreground text-sm sm:text-base mobile-hide-description">
             Track your academic journey and achievements
           </p>
         </div>

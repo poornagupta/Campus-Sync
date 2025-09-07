@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Clock, MapPin, Plus, Calendar, User, Edit3, Trash2, X } from "lucide-react";
+import { Clock, MapPin, Plus, Calendar, User, Edit3, Archive, X } from "lucide-react";
 import { usePageLoading } from "@/hooks/use-page-loading";
 import { GenericPageSkeleton } from "@/components/ui/page-skeleton";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -201,11 +201,11 @@ const Timetable = () => {
     });
   };
 
-  const handleDeleteClass = (id: number) => {
+  const handleArchiveClass = (id: number) => {
     setClasses(prev => prev.filter(c => c.id !== id));
     toast({
-      title: "Class Removed",
-      description: "The class has been removed from your timetable.",
+      title: "Class Archived",
+      description: "The class has been archived and removed from your timetable.",
     });
   };
 
@@ -227,7 +227,7 @@ const Timetable = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 min-h-0">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div className="flex items-center gap-3">
           <Calendar className="h-8 w-8 text-primary" />
@@ -383,32 +383,52 @@ const Timetable = () => {
           <CardDescription>Your classes arranged in a weekly timetable</CardDescription>
         </CardHeader>
         <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <Table>
+          <div className="overflow-x-scroll overflow-y-hidden -webkit-overflow-scrolling-touch">
+            <Table className="min-w-[900px] w-full table-fixed">
               <TableHeader>
-                <TableRow className="bg-muted/50">
-                  <TableHead className="w-16 text-center font-bold border-r">THEORY</TableHead>
-                  <TableHead className="text-center font-semibold border-r">Start<br/>End</TableHead>
-                  <TableHead className="text-center font-semibold border-r">08:30<br/>10:00</TableHead>
-                  <TableHead className="text-center font-semibold border-r">10:05<br/>11:35</TableHead>
-                  <TableHead className="text-center font-semibold border-r">11:40<br/>13:10</TableHead>
-                  <TableHead className="text-center font-semibold border-r">Lunch</TableHead>
-                  <TableHead className="text-center font-semibold border-r">13:15<br/>14:45</TableHead>
-                  <TableHead className="text-center font-semibold border-r">14:50<br/>16:20</TableHead>
-                  <TableHead className="text-center font-semibold border-r">16:25<br/>17:55</TableHead>
-                  <TableHead className="text-center font-semibold">18:00<br/>19:30</TableHead>
+                <TableRow className="bg-background">
+                  <TableHead className="w-[70px] text-center font-bold border-r sticky left-0 bg-background z-20">
+                    <div className="text-[10px] sm:text-xs">THEORY</div>
+                  </TableHead>
+                  <TableHead className="w-[50px] text-center font-semibold border-r">
+                    <div className="text-[9px] sm:text-[10px] leading-tight">Start<br/>End</div>
+                  </TableHead>
+                  <TableHead className="w-[90px] text-center font-semibold border-r">
+                    <div className="text-[9px] sm:text-[10px] leading-tight">08:30<br/>10:00</div>
+                  </TableHead>
+                  <TableHead className="w-[90px] text-center font-semibold border-r">
+                    <div className="text-[9px] sm:text-[10px] leading-tight">10:05<br/>11:35</div>
+                  </TableHead>
+                  <TableHead className="w-[90px] text-center font-semibold border-r">
+                    <div className="text-[9px] sm:text-[10px] leading-tight">11:40<br/>13:10</div>
+                  </TableHead>
+                  <TableHead className="w-[50px] text-center font-semibold border-r">
+                    <div className="text-[9px] sm:text-[10px]">Lunch</div>
+                  </TableHead>
+                  <TableHead className="w-[90px] text-center font-semibold border-r">
+                    <div className="text-[9px] sm:text-[10px] leading-tight">13:15<br/>14:45</div>
+                  </TableHead>
+                  <TableHead className="w-[90px] text-center font-semibold border-r">
+                    <div className="text-[9px] sm:text-[10px] leading-tight">14:50<br/>16:20</div>
+                  </TableHead>
+                  <TableHead className="w-[90px] text-center font-semibold border-r">
+                    <div className="text-[9px] sm:text-[10px] leading-tight">16:25<br/>17:55</div>
+                  </TableHead>
+                  <TableHead className="w-[90px] text-center font-semibold">
+                    <div className="text-[9px] sm:text-[10px] leading-tight">18:00<br/>19:30</div>
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {weekDays.map((day, dayIndex) => (
                   <TableRow key={day} className="border-b">
-                    <TableCell className="font-semibold text-center bg-muted/30 border-r">{day}</TableCell>
-                    <TableCell className="font-medium text-center bg-muted/20 border-r">THEORY</TableCell>
+                    <TableCell className="font-semibold text-center bg-background border-r sticky left-0 z-10 text-[10px] sm:text-xs">{day}</TableCell>
+                    <TableCell className="font-medium text-center bg-muted/20 border-r text-[9px] sm:text-[10px]">THEORY</TableCell>
                     {timeLabels.map((timeSlot, timeIndex) => {
                       // Special handling for lunch time
                       if (timeSlot.start === "13:15") {
                         return (
-                          <TableCell key={`${day}-lunch`} className="text-center border-r bg-secondary/20 py-4">
+                          <TableCell key={`${day}-lunch`} className="text-center border-r bg-secondary/20 py-2 text-[9px] sm:text-[10px]">
                             Lunch
                           </TableCell>
                         );
@@ -430,7 +450,7 @@ const Timetable = () => {
                       return (
                         <TableCell 
                           key={`${day}-${timeSlot.start}`} 
-                          className={`text-center border-r p-1 cursor-pointer transition-colors min-h-[60px] ${
+                          className={`text-center border-r p-0.5 cursor-pointer transition-colors min-h-[60px] ${
                             classForSlot 
                               ? classForSlot.type === 'Lab' || classForSlot.type === 'Practical'
                                 ? 'bg-red-100 hover:bg-red-200 text-red-800' 
@@ -440,13 +460,13 @@ const Timetable = () => {
                           onClick={() => classForSlot && setSelectedClass(classForSlot)}
                         >
                           {classForSlot ? (
-                            <div className="text-[10px] py-2 px-1 leading-tight">
-                              <div className="font-bold break-words">
+                            <div className="py-1 px-0.5 leading-tight h-full flex flex-col justify-center">
+                              <div className="font-bold break-words text-[8px] sm:text-[9px] leading-tight">
                                 {classForSlot.code}
                               </div>
                             </div>
                           ) : (
-                            <div className="text-xs text-muted-foreground py-3">
+                            <div className="text-[8px] sm:text-[9px] text-muted-foreground py-2">
                               {timeIndex !== 3 ? getRoomCode(dayIndex, timeIndex) : ''}
                             </div>
                           )}
@@ -505,10 +525,10 @@ const Timetable = () => {
                       <Button 
                         variant="ghost" 
                         size="icon" 
-                        className="h-8 w-8 text-destructive hover:text-destructive"
-                        onClick={() => handleDeleteClass(cls.id)}
+                        className="h-8 w-8 text-secondary hover:text-secondary"
+                        onClick={() => handleArchiveClass(cls.id)}
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Archive className="h-4 w-4" />
                       </Button>
                     </div>
                   </div>
@@ -546,74 +566,94 @@ const Timetable = () => {
 
       {/* Class Details Dialog */}
       <Dialog open={!!selectedClass} onOpenChange={() => setSelectedClass(null)}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Badge className={getClassTypeStyle(selectedClass?.type || "")}>
+        <DialogContent className="max-w-[95vw] sm:max-w-md mx-4 sm:mx-auto max-h-[90vh] overflow-y-auto">
+          <DialogHeader className="space-y-3">
+            <DialogTitle className="flex flex-col sm:flex-row sm:items-center gap-2 text-left">
+              <Badge className={getClassTypeStyle(selectedClass?.type || "")} variant="secondary">
                 {selectedClass?.code}
               </Badge>
-              {selectedClass?.name}
+              <span className="text-foreground font-semibold text-base sm:text-lg">
+                {selectedClass?.name}
+              </span>
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-muted-foreground text-sm">
               Class details and information
             </DialogDescription>
           </DialogHeader>
           {selectedClass && (
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-sm font-medium text-muted-foreground">Time</Label>
-                  <div className="flex items-center gap-1 mt-1">
-                    <Clock className="h-4 w-4" />
-                    {selectedClass.startTime} - {selectedClass.endTime}
+            <div className="space-y-6 py-2">
+              {/* Time and Day Info */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Time</Label>
+                  <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+                    <Clock className="h-4 w-4 text-primary flex-shrink-0" />
+                    <span className="text-foreground font-medium">
+                      {selectedClass.startTime} - {selectedClass.endTime}
+                    </span>
                   </div>
                 </div>
-                <div>
-                  <Label className="text-sm font-medium text-muted-foreground">Day</Label>
-                  <div className="mt-1">{weekDays[selectedClass.day]}</div>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Day</Label>
+                  <div className="p-3 bg-muted/50 rounded-lg">
+                    <span className="text-foreground font-medium">{weekDays[selectedClass.day]}</span>
+                  </div>
                 </div>
               </div>
               
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-sm font-medium text-muted-foreground">Location</Label>
-                  <div className="flex items-center gap-1 mt-1">
-                    <MapPin className="h-4 w-4" />
-                    {selectedClass.location}
+              {/* Location and Instructor Info */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Location</Label>
+                  <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+                    <MapPin className="h-4 w-4 text-primary flex-shrink-0" />
+                    <span className="text-foreground font-medium truncate">
+                      {selectedClass.location}
+                    </span>
                   </div>
                 </div>
-                <div>
-                  <Label className="text-sm font-medium text-muted-foreground">Instructor</Label>
-                  <div className="flex items-center gap-1 mt-1">
-                    <User className="h-4 w-4" />
-                    {selectedClass.instructor}
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Instructor</Label>
+                  <div className="flex items-center gap-2 p-3 bg-muted/50 rounded-lg">
+                    <User className="h-4 w-4 text-primary flex-shrink-0" />
+                    <span className="text-foreground font-medium truncate">
+                      {selectedClass.instructor}
+                    </span>
                   </div>
                 </div>
               </div>
 
+              {/* Description */}
               {selectedClass.description && (
-                <div>
-                  <Label className="text-sm font-medium text-muted-foreground">Description</Label>
-                  <p className="mt-1 text-sm">{selectedClass.description}</p>
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-muted-foreground uppercase tracking-wide">Description</Label>
+                  <div className="p-3 bg-muted/50 rounded-lg">
+                    <p className="text-foreground text-sm leading-relaxed">{selectedClass.description}</p>
+                  </div>
                 </div>
               )}
             </div>
           )}
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setSelectedClass(null)}>
+          <DialogFooter className="flex flex-col sm:flex-row gap-2 sm:gap-0 pt-4 border-t">
+            <Button 
+              variant="outline" 
+              onClick={() => setSelectedClass(null)}
+              className="w-full sm:w-auto order-2 sm:order-1"
+            >
               Close
             </Button>
             <Button 
-              variant="destructive" 
+              variant="secondary" 
               onClick={() => {
                 if (selectedClass) {
-                  handleDeleteClass(selectedClass.id);
+                  handleArchiveClass(selectedClass.id);
                   setSelectedClass(null);
                 }
               }}
+              className="w-full sm:w-auto order-1 sm:order-2"
             >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Delete Class
+              <Archive className="h-4 w-4 mr-2" />
+              Archive Class
             </Button>
           </DialogFooter>
         </DialogContent>

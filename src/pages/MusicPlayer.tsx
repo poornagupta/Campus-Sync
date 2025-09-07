@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo, useCallback, memo } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,33 +17,45 @@ import {
   Search,
   Music,
   ListMusic,
-  Download
+  Download,
+  Loader2
 } from "lucide-react";
 import { usePageLoading } from "@/hooks/use-page-loading";
 import { GenericPageSkeleton } from "@/components/ui/page-skeleton";
 import { ImageLoader } from "@/components/ui/image-loader";
+import { useAudioPlayer, type AudioTrack } from "@/hooks/useAudioPlayer";
+import lofiStudyCover from "@/assets/lofi-study-cover.jpg";
+import ambientFocusCover from "@/assets/ambient-focus-cover.jpg";
+import electronicCodingCover from "@/assets/electronic-coding-cover.jpg";
+import jazzCoffeeCover from "@/assets/jazz-coffee-cover.jpg";
+import classicalStudyCover from "@/assets/classical-study-cover.jpg";
+import natureSoundsCover from "@/assets/nature-sounds-cover.jpg";
+import ambientFocusAudio from "@/assets/audio/ambient-focus.mp3";
 
-interface Song {
-  id: number;
-  title: string;
-  artist: string;
-  album: string;
-  duration: string;
-  genre: string;
-  coverArt: string;
-  favorite: boolean;
-}
+// Using AudioTrack interface from useAudioPlayer hook
 
 const MusicPlayer = () => {
   const isLoading = usePageLoading();
+  const {
+    currentTrack,
+    isPlaying,
+    volume,
+    currentTime,
+    duration,
+    isLoading: audioLoading,
+    playTrack,
+    togglePlayPause,
+    seekTo,
+    setVolumeLevel,
+    formatTime,
+    progress
+  } = useAudioPlayer();
 
-  const [currentSong, setCurrentSong] = useState<Song | null>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState([75]);
-  const [progress, setProgress] = useState([0]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [favorites, setFavorites] = useState<number[]>([1, 3, 5]);
+  const [loadingSongId, setLoadingSongId] = useState<number | null>(null);
 
-  const songs: Song[] = [
+  const songs: AudioTrack[] = [
     {
       id: 1,
       title: "Lo-fi Study Beat",
@@ -51,7 +63,8 @@ const MusicPlayer = () => {
       album: "Study Session Vol. 1",
       duration: "3:03",
       genre: "Lo-fi",
-      coverArt: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=400&fit=crop",
+      coverArt: lofiStudyCover,
+      audioUrl: ambientFocusAudio, // Using available audio file
       favorite: true
     },
     {
@@ -61,7 +74,8 @@ const MusicPlayer = () => {
       album: "Concentration",
       duration: "4:00",
       genre: "Ambient",
-      coverArt: "https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=400&h=400&fit=crop",
+      coverArt: ambientFocusCover,
+      audioUrl: ambientFocusAudio,
       favorite: false
     },
     {
@@ -71,7 +85,8 @@ const MusicPlayer = () => {
       album: "Late Night Sessions",
       duration: "3:30",
       genre: "Electronic",
-      coverArt: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=400&h=400&fit=crop",
+      coverArt: electronicCodingCover,
+      audioUrl: ambientFocusAudio,
       favorite: true
     },
     {
@@ -81,7 +96,8 @@ const MusicPlayer = () => {
       album: "Cafe Sounds",
       duration: "4:15",
       genre: "Jazz",
-      coverArt: "https://images.unsplash.com/photo-1442406964439-e46ab8eff7e4?w=400&h=400&fit=crop",
+      coverArt: jazzCoffeeCover,
+      audioUrl: ambientFocusAudio,
       favorite: false
     },
     {
@@ -91,7 +107,8 @@ const MusicPlayer = () => {
       album: "Focus Classical",
       duration: "5:20",
       genre: "Classical",
-      coverArt: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=400&fit=crop",
+      coverArt: classicalStudyCover,
+      audioUrl: ambientFocusAudio,
       favorite: true
     },
     {
@@ -101,7 +118,8 @@ const MusicPlayer = () => {
       album: "Natural Ambience",
       duration: "8:00",
       genre: "Nature",
-      coverArt: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=400&fit=crop",
+      coverArt: natureSoundsCover,
+      audioUrl: ambientFocusAudio,
       favorite: false
     }
   ];
@@ -119,47 +137,75 @@ const MusicPlayer = () => {
     song.genre.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const favoriteSongs = songs.filter(song => song.favorite);
+  const favoriteSongs = songs.filter(song => favorites.includes(song.id));
 
-  const playSong = (song: Song) => {
-    setCurrentSong(song);
-    setIsPlaying(true);
-  };
-
-  const togglePlayPause = () => {
-    setIsPlaying(!isPlaying);
-  };
+  const handlePlaySong = useCallback(async (song: AudioTrack) => {
+    setLoadingSongId(song.id);
+    try {
+      await playTrack(song);
+    } finally {
+      setLoadingSongId(null);
+    }
+  }, [playTrack]);
 
   const toggleFavorite = (songId: number) => {
-    // In a real app, this would update the song in the state
-    console.log(`Toggle favorite for song ${songId}`);
+    setFavorites(prev => 
+      prev.includes(songId) 
+        ? prev.filter(id => id !== songId)
+        : [...prev, songId]
+    );
   };
 
-  const SongCard = ({ song, isLarge = false }: { song: Song, isLarge?: boolean }) => (
+  const handleSeek = (value: number[]) => {
+    const newTime = (value[0] / 100) * duration;
+    seekTo(newTime);
+  };
+
+  const handleVolumeChange = (value: number[]) => {
+    setVolumeLevel(value[0]);
+  };
+
+  // Memoized SongCard component to prevent unnecessary re-renders
+  const SongCard = memo(({ song, isLarge = false }: { song: AudioTrack, isLarge?: boolean }) => {
+    const isFavorite = favorites.includes(song.id);
+    const isCurrentSong = currentTrack?.id === song.id;
+    const isCardLoading = loadingSongId === song.id;
+    
+    return (
     <Card className="group hover:shadow-xl hover:shadow-primary/20 transition-all duration-300 overflow-hidden border-0 bg-gradient-to-br from-card to-card/50 backdrop-blur-sm">
       <div className="relative">
         <ImageLoader
           src={song.coverArt} 
           alt={song.title}
           className={`w-full object-cover ${isLarge ? 'h-56' : 'h-40'} transition-transform duration-300 group-hover:scale-105`}
+          key={`${song.id}-${song.coverArt}`} // Stable key to prevent image reloads
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300" />
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-300 flex items-center justify-center">
           <Button
             size={isLarge ? "lg" : "default"}
-            className="opacity-0 group-hover:opacity-100 transition-all duration-300 scale-90 group-hover:scale-100 bg-primary/90 backdrop-blur-md border-0 text-primary-foreground hover:bg-primary shadow-lg"
-            onClick={() => playSong(song)}
+            className={`transition-all duration-300 scale-90 group-hover:scale-100 bg-primary/90 backdrop-blur-md border-0 text-primary-foreground hover:bg-primary shadow-lg ${
+              isCurrentSong ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+            }`}
+            onClick={() => handlePlaySong(song)}
+            disabled={isCardLoading}
           >
-            <Play className={`${isLarge ? 'h-6 w-6' : 'h-5 w-5'} ml-1`} />
+            {isCardLoading ? (
+              <Loader2 className={`${isLarge ? 'h-6 w-6' : 'h-5 w-5'} animate-spin`} />
+            ) : (isPlaying && isCurrentSong) ? (
+              <Pause className={`${isLarge ? 'h-6 w-6' : 'h-5 w-5'}`} />
+            ) : (
+              <Play className={`${isLarge ? 'h-6 w-6' : 'h-5 w-5'} ml-1`} />
+            )}
           </Button>
         </div>
         <Button
           variant="ghost"
           size="sm"
           onClick={() => toggleFavorite(song.id)}
-          className={`absolute top-3 right-3 ${song.favorite ? "text-red-500" : "text-white/80"} hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black/20 backdrop-blur-sm border-0`}
+          className={`absolute top-3 right-3 ${isFavorite ? "text-red-500" : "text-white/80"} hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all duration-300 bg-black/20 backdrop-blur-sm border-0`}
         >
-          <Heart className={`h-4 w-4 ${song.favorite ? "fill-current" : ""}`} />
+          <Heart className={`h-4 w-4 ${isFavorite ? "fill-current" : ""}`} />
         </Button>
         <Badge 
           variant="secondary" 
@@ -179,7 +225,8 @@ const MusicPlayer = () => {
         </div>
       </CardContent>
     </Card>
-  );
+    );
+  });
 
   if (isLoading) {
     return <GenericPageSkeleton />
@@ -193,8 +240,8 @@ const MusicPlayer = () => {
             <Music className="h-8 w-8 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">Music Player</h1>
-            <p className="text-muted-foreground text-lg">Listen to music while you study</p>
+            <h1 className="mobile-heading-large font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent">Music Player</h1>
+            <p className="text-muted-foreground text-lg mobile-hide-description">Listen to music while you study</p>
           </div>
         </div>
         <div className="flex gap-2">
@@ -209,37 +256,44 @@ const MusicPlayer = () => {
       </div>
 
       {/* Current Player */}
-      {currentSong && (
+      {currentTrack && (
         <Card className="bg-gradient-to-r from-card/95 to-card/90 backdrop-blur-lg border-primary/20 shadow-2xl">
           <CardContent className="p-8">
             <div className="flex flex-col md:flex-row items-center gap-8">
               <div className="relative">
                 <ImageLoader
-                  src={currentSong.coverArt} 
-                  alt={currentSong.title}
+                  src={currentTrack.coverArt} 
+                  alt={currentTrack.title}
                   className="w-32 h-32 rounded-2xl object-cover shadow-2xl"
                 />
                 <div className="absolute inset-0 rounded-2xl bg-gradient-to-t from-black/20 to-transparent" />
+                {isPlaying && (
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-8 h-8 rounded-full bg-primary/20 backdrop-blur-sm flex items-center justify-center">
+                      <div className="w-4 h-4 bg-primary rounded-full animate-pulse" />
+                    </div>
+                  </div>
+                )}
               </div>
               <div className="flex-1 text-center md:text-left space-y-4">
                 <div>
-                  <h3 className="text-2xl font-bold text-foreground">{currentSong.title}</h3>
-                  <p className="text-lg text-muted-foreground font-medium">{currentSong.artist}</p>
+                  <h3 className="text-2xl font-bold text-foreground">{currentTrack.title}</h3>
+                  <p className="text-lg text-muted-foreground font-medium">{currentTrack.artist}</p>
                   <Badge variant="outline" className="mt-2 border-primary/30 text-primary">
-                    {currentSong.genre}
+                    {currentTrack.genre}
                   </Badge>
                 </div>
                 <div className="mt-4">
                   <Slider
-                    value={progress}
-                    onValueChange={setProgress}
+                    value={[progress]}
+                    onValueChange={handleSeek}
                     max={100}
-                    step={1}
+                    step={0.1}
                     className="w-full"
                   />
                   <div className="flex justify-between text-sm text-muted-foreground mt-2 font-mono">
-                    <span>0:00</span>
-                    <span>{currentSong.duration}</span>
+                    <span>{formatTime(currentTime)}</span>
+                    <span>{formatTime(duration)}</span>
                   </div>
                 </div>
               </div>
@@ -255,8 +309,15 @@ const MusicPlayer = () => {
                     onClick={togglePlayPause} 
                     size="lg" 
                     className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg w-14 h-14 rounded-full"
+                    disabled={audioLoading}
                   >
-                    {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6 ml-1" />}
+                    {audioLoading ? (
+                      <Loader2 className="h-6 w-6 animate-spin" />
+                    ) : isPlaying ? (
+                      <Pause className="h-6 w-6" />
+                    ) : (
+                      <Play className="h-6 w-6 ml-1" />
+                    )}
                   </Button>
                   <Button variant="ghost" className="hover:bg-primary/10">
                     <SkipForward className="h-5 w-5" />
@@ -268,12 +329,13 @@ const MusicPlayer = () => {
                 <div className="flex items-center gap-3">
                   <Volume2 className="h-4 w-4 text-muted-foreground" />
                   <Slider
-                    value={volume}
-                    onValueChange={setVolume}
+                    value={[volume]}
+                    onValueChange={handleVolumeChange}
                     max={100}
                     step={1}
                     className="w-24"
                   />
+                  <span className="text-xs text-muted-foreground w-8 text-right">{volume}%</span>
                 </div>
               </div>
             </div>
@@ -371,7 +433,7 @@ const MusicPlayer = () => {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => playSong(song)}
+                      onClick={() => handlePlaySong(song)}
                       className="opacity-0 group-hover:opacity-100 transition-opacity"
                     >
                       <Play className="h-3 w-3" />

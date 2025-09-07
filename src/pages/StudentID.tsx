@@ -8,31 +8,56 @@ import { ProfileSkeleton } from "@/components/ui/profile-skeleton"
 import { QRCodeModal } from "@/components/ui/qr-code-modal"
 import { Download, QrCode, CreditCard, Shield, Calendar } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import { useUserData } from "@/hooks/useUserData"
+import { useStudentIDData } from "@/hooks/useStudentIDData"
+import { EditStudentIDDialog } from "@/components/profile/EditStudentIDDialog"
 
 export default function StudentID() {
   const isLoading = usePageLoading()
   const { toast } = useToast()
   const [qrModalOpen, setQrModalOpen] = useState(false)
+  const [editStudentIDOpen, setEditStudentIDOpen] = useState(false)
+  const { userData } = useUserData()
+  const { studentIDData, updateStudentIDData } = useStudentIDData()
+
+  const handleStudentIDUpdate = (updatedData: any) => {
+    updateStudentIDData(updatedData)
+    toast({
+      title: "Student ID Updated",
+      description: "Your Student ID information has been updated successfully."
+    })
+  }
+
+  // Combined data for Student ID card display
+  const idCardData = {
+    // Profile data
+    name: userData.name || "John Student",
+    email: userData.email || "john@university.edu",
+    phone: userData.phone || "+1 (555) 123-4567",
+    studentId: userData.studentId || "STU-2024-001",
+    course: userData.course || "Computer Science Engineering",
+    year: userData.year || "3rd Year",
+    semester: userData.semester || "6th Semester",
+    cgpa: userData.cgpa || "8.65",
+    avatar: userData.avatar || "/placeholder.svg",
+    address: userData.address || "123 University Street, Campus City, ST 12345",
+    enrollmentDate: userData.enrollmentDate || "August 2022",
+    expectedGraduation: userData.expectedGraduation || "May 2026",
+    status: userData.status || "Active",
+    // Student ID specific data
+    section: studentIDData.section || "A",
+    rollNumber: studentIDData.rollNumber || "20CS001",
+    admissionYear: studentIDData.admissionYear || "2022",
+    validUntil: studentIDData.validUntil || "2026",
+    bloodGroup: studentIDData.bloodGroup || "O+",
+    emergencyContact: studentIDData.emergencyContact || "+1 (555) 987-6543",
+    hostelBlock: studentIDData.hostelBlock || "Block-C",
+    roomNumber: studentIDData.roomNumber || "C-301",
+    libraryId: studentIDData.libraryId || "LIB-20CS001"
+  }
 
   if (isLoading) {
     return <ProfileSkeleton />
-  }
-
-  const studentData = {
-    name: "John Student",
-    studentId: "STU-2024-001",
-    course: "Computer Science Engineering",
-    year: "3rd Year",
-    section: "A",
-    rollNumber: "20CS001",
-    admissionYear: "2022",
-    validUntil: "2026",
-    bloodGroup: "O+",
-    emergencyContact: "+1 (555) 987-6543",
-    avatar: "/placeholder.svg",
-    hostelBlock: "Block-C",
-    roomNumber: "C-301",
-    libraryId: "LIB-20CS001"
   }
 
   const handleDownloadID = () => {
@@ -54,12 +79,21 @@ export default function StudentID() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Student ID Card</h1>
-          <p className="text-muted-foreground text-sm sm:text-base hidden sm:block">
+          <h1 className="mobile-heading-large font-bold tracking-tight">Student ID Card</h1>
+          <p className="text-muted-foreground text-sm sm:text-base mobile-hide-description">
             Your official student identification
           </p>
         </div>
         <div className="flex gap-2 w-full sm:w-auto">
+          <Button 
+            variant="outline" 
+            className="flex-1 sm:flex-none"
+            onClick={() => setEditStudentIDOpen(true)}
+          >
+            <CreditCard className="mr-2 h-4 w-4" />
+            <span className="hidden sm:inline">Edit ID Info</span>
+            <span className="sm:hidden">Edit</span>
+          </Button>
           <Button 
             variant="outline" 
             className="flex-1 sm:flex-none"
@@ -94,15 +128,17 @@ export default function StudentID() {
               {/* Student Photo and Basic Info */}
               <div className="flex items-start gap-3 sm:gap-4 mb-4 sm:mb-6">
                 <Avatar className="h-16 w-16 sm:h-20 sm:w-20 border-2 border-primary">
-                  <AvatarImage src={studentData.avatar} alt={studentData.name} />
-                  <AvatarFallback className="text-sm sm:text-lg">JS</AvatarFallback>
+                  <AvatarImage src={idCardData.avatar} alt={idCardData.name} />
+                  <AvatarFallback className="text-sm sm:text-lg">
+                    {idCardData.name.split(' ').map(n => n[0]).join('').toUpperCase()}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="flex-1 space-y-1">
-                  <h4 className="font-bold text-base sm:text-lg">{studentData.name}</h4>
-                  <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">{studentData.course}</p>
+                  <h4 className="font-bold text-base sm:text-lg">{idCardData.name}</h4>
+                  <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2">{idCardData.course}</p>
                   <div className="flex items-center gap-1 sm:gap-2">
-                    <Badge variant="secondary" className="text-xs">{studentData.year}</Badge>
-                    <Badge variant="outline" className="text-xs">Sec {studentData.section}</Badge>
+                    <Badge variant="secondary" className="text-xs">{idCardData.year}</Badge>
+                    <Badge variant="outline" className="text-xs">Sec {idCardData.section}</Badge>
                   </div>
                 </div>
               </div>
@@ -111,15 +147,15 @@ export default function StudentID() {
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Student ID:</span>
-                  <span className="font-mono font-semibold">{studentData.studentId}</span>
+                  <span className="font-mono font-semibold">{idCardData.studentId}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Roll Number:</span>
-                  <span className="font-mono">{studentData.rollNumber}</span>
+                  <span className="font-mono">{idCardData.rollNumber}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Valid Until:</span>
-                  <span>{studentData.validUntil}</span>
+                  <span>{idCardData.validUntil}</span>
                 </div>
               </div>
 
@@ -151,27 +187,27 @@ export default function StudentID() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm">
                 <div>
                   <label className="text-muted-foreground text-xs">Student ID</label>
-                  <p className="font-mono font-semibold text-sm">{studentData.studentId}</p>
+                  <p className="font-mono font-semibold text-sm">{idCardData.studentId}</p>
                 </div>
                 <div>
                   <label className="text-muted-foreground text-xs">Roll Number</label>
-                  <p className="font-mono text-sm">{studentData.rollNumber}</p>
+                  <p className="font-mono text-sm">{idCardData.rollNumber}</p>
                 </div>
                 <div className="sm:col-span-2">
                   <label className="text-muted-foreground text-xs">Course</label>
-                  <p className="text-sm">{studentData.course}</p>
+                  <p className="text-sm">{idCardData.course}</p>
                 </div>
                 <div>
                   <label className="text-muted-foreground text-xs">Year & Section</label>
-                  <p className="text-sm">{studentData.year} - Section {studentData.section}</p>
+                  <p className="text-sm">{idCardData.year} - Section {idCardData.section}</p>
                 </div>
                 <div>
                   <label className="text-muted-foreground text-xs">Admission Year</label>
-                  <p className="text-sm">{studentData.admissionYear}</p>
+                  <p className="text-sm">{idCardData.admissionYear}</p>
                 </div>
                 <div className="sm:col-span-2">
                   <label className="text-muted-foreground text-xs">Library ID</label>
-                  <p className="font-mono text-sm">{studentData.libraryId}</p>
+                  <p className="font-mono text-sm">{idCardData.libraryId}</p>
                 </div>
               </div>
             </CardContent>
@@ -186,19 +222,19 @@ export default function StudentID() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm">
                 <div>
                   <label className="text-muted-foreground text-xs">Blood Group</label>
-                  <p className="font-semibold text-red-600">{studentData.bloodGroup}</p>
+                  <p className="font-semibold text-red-600">{idCardData.bloodGroup}</p>
                 </div>
                 <div>
                   <label className="text-muted-foreground text-xs">Emergency Contact</label>
-                  <p className="font-mono text-sm">{studentData.emergencyContact}</p>
+                  <p className="font-mono text-sm">{idCardData.emergencyContact}</p>
                 </div>
                 <div>
                   <label className="text-muted-foreground text-xs">Hostel Block</label>
-                  <p className="text-sm">{studentData.hostelBlock}</p>
+                  <p className="text-sm">{idCardData.hostelBlock}</p>
                 </div>
                 <div>
                   <label className="text-muted-foreground text-xs">Room Number</label>
-                  <p className="text-sm">{studentData.roomNumber}</p>
+                  <p className="text-sm">{idCardData.roomNumber}</p>
                 </div>
               </div>
             </CardContent>
@@ -215,7 +251,7 @@ export default function StudentID() {
             <CardContent>
               <div className="flex items-center justify-between p-4 bg-green-50 dark:bg-green-950 rounded-lg border border-green-200 dark:border-green-800">
                 <div>
-                  <p className="font-semibold text-green-700 dark:text-green-300">Valid Until {studentData.validUntil}</p>
+                  <p className="font-semibold text-green-700 dark:text-green-300">Valid Until {idCardData.validUntil}</p>
                   <p className="text-sm text-green-600 dark:text-green-400">This ID card is currently active</p>
                 </div>
                 <Shield className="h-8 w-8 text-green-600" />
@@ -258,8 +294,15 @@ export default function StudentID() {
       <QRCodeModal
         open={qrModalOpen}
         onOpenChange={setQrModalOpen}
-        data={studentData}
+        data={idCardData}
         title="Student ID"
+      />
+
+      <EditStudentIDDialog
+        open={editStudentIDOpen}
+        onOpenChange={setEditStudentIDOpen}
+        studentIDData={studentIDData}
+        onSave={handleStudentIDUpdate}
       />
     </div>
   )

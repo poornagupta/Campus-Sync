@@ -516,8 +516,8 @@ const Tasks = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Tasks & Assignments</h1>
-          <p className="text-muted-foreground">Manage your academic tasks and personal goals efficiently</p>
+          <h1 className="mobile-heading font-bold">Tasks & Assignments</h1>
+          <p className="text-muted-foreground mobile-hide-description">Manage your academic tasks and personal goals efficiently</p>
         </div>
         
         <Dialog open={newTaskDialogOpen} onOpenChange={setNewTaskDialogOpen}>

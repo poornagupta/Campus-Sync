@@ -229,8 +229,8 @@ const Notes = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Enhanced Notes</h1>
-          <p className="text-muted-foreground">Professional note-taking with AI-powered study features</p>
+          <h1 className="mobile-heading font-bold">Enhanced Notes</h1>
+          <p className="text-muted-foreground mobile-hide-description">Professional note-taking with AI-powered study features</p>
         </div>
         <div className="flex gap-2">
           <Button onClick={() => setIsEditorOpen(true)} className="flex items-center gap-2">

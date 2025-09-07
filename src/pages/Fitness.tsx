@@ -1,15 +1,18 @@
+import { Dumbbell, Target, Flame, Clock, Plus, Pause, Play, RotateCcw, Heart, Zap, Activity, Info } from "lucide-react";
+import { usePageLoading } from "@/hooks/use-page-loading";
+import { GenericPageSkeleton } from "@/components/ui/page-skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Dumbbell, Target, Clock, Flame, Plus, Play, Pause, RotateCcw, Zap, Heart, Activity, Info } from "lucide-react";
-import { usePageLoading } from "@/hooks/use-page-loading";
-import { GenericPageSkeleton } from "@/components/ui/page-skeleton";
 import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
+import { FitnessStats } from "@/components/fitness/FitnessStats";
+import { WorkoutCard } from "@/components/fitness/WorkoutCard";
+import { ActiveWorkoutCard } from "@/components/fitness/ActiveWorkoutCard";
 
 interface FitnessData {
   steps: number;
@@ -194,8 +197,8 @@ const Fitness = () => {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Fitness</h1>
-        <p className="text-muted-foreground">Track your health and fitness goals</p>
+        <h1 className="mobile-heading font-bold">Fitness</h1>
+        <p className="text-muted-foreground mobile-hide-description">Track your health and fitness goals</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
