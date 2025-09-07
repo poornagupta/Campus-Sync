@@ -2,8 +2,9 @@
 
 ## 🎓 Project Overview
 
-CampusSync is a modern, comprehensive educational management platform designed to streamline academic operations for students, teachers, and administrators. Built with cutting-edge technologies, it provides a unified solution for managing all aspects of campus life.
+CampusSync is a modern, comprehensive educational management platform designed by **Mausam Kar** to streamline academic operations for students, teachers, and administrators. Built with cutting-edge technologies, it provides a unified solution for managing all aspects of campus life.
 
+**Developer**: Mausam Kar
 **Live Demo**: https://lovable.dev/projects/8c8ba721-0263-4934-b067-fa6a90b9418b
 
 ## ✨ Key Features
@@ -205,6 +206,8 @@ Read more: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/cus
 
 ## 🤝 Contributing
 
+Contributions to CampusSync are welcome! As the creator, Mausam Kar has built a solid foundation, and community contributions can help enhance the platform further.
+
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
@@ -221,3 +224,4 @@ For questions or support:
 - Check the [Lovable Documentation](https://docs.lovable.dev/)
 - Join the [Lovable Discord Community](https://discord.com/channels/1119885301872070706/1280461670979993613)
 - Review the project structure in [FOLDER_STRUCTURE.md](./FOLDER_STRUCTURE.md)
+- Contact the creator: Mausam Kar
