@@ -4,7 +4,8 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-5.0+-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.0+-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
-[![Supabase](https://img.shields.io/badge/Supabase-2.0+-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.io/)
+[![Express.js](https://img.shields.io/badge/Express.js-4.x-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+[![MongoDB](https://img.shields.io/badge/MongoDB-4.x-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://mongodb.com/)
 [![Vercel](https://img.shields.io/badge/Vercel-Deployment-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
 [![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
 
@@ -74,17 +75,73 @@ CampusSync is a modern, comprehensive educational management platform designed b
 - **Lucide React** - Icon library
 
 ### Backend & Services
-- **Supabase** - Backend-as-a-Service
-  - Authentication & Authorization
-  - PostgreSQL Database
-  - Real-time subscriptions
-  - Edge Functions
-- **AI Integration** - Custom AI assistant functionality
+- **Express.js** - Web application framework
+- **MongoDB** - NoSQL database with Mongoose ODM
+- **JWT Authentication** - Secure user authentication
+- **RESTful APIs** - Standardized API architecture
+- **Cloud Storage** - File storage solutions
+- **Payment Integration** - Stripe or similar payment processors
 
 ### Development Tools
 - **ESLint** - Code linting
 - **PostCSS** - CSS processing
 - **TypeScript** - Static type checking
+- **Jest** - Testing framework
+- **Docker** - Containerization
+
+## 🏗️ Backend Architecture (Planned Migration)
+
+CampusSync is currently using Supabase as the backend service. However, we are planning to migrate to a custom backend solution using Express.js and MongoDB for greater flexibility and control. This migration will provide:
+
+### Architecture Overview
+- **Framework**: Express.js for RESTful API development
+- **Database**: MongoDB with Mongoose ODM for data modeling
+- **Authentication**: JWT-based authentication with role-based access control
+- **API Documentation**: Swagger/OpenAPI for comprehensive API documentation
+- **Validation**: Joi/Zod for request validation
+- **Logging**: Winston for application logging
+- **Testing**: Jest/Supertest for unit and integration testing
+- **Deployment**: Docker + Docker Compose for containerization
+
+### Core Collections
+1. **Users** - User profiles and authentication data
+2. **Students** - Student-specific information and academic records
+3. **Teachers** - Teacher profiles and course assignments
+4. **Admins** - Administrative user permissions and settings
+5. **Courses** - Academic courses with schedules and instructors
+6. **Assignments** - Course assignments with submission tracking
+7. **Attendance** - Student attendance records
+8. **Grades** - Academic grades and performance metrics
+9. **Exams** - Examination schedules and results
+10. **Billing** - Financial records and payment tracking
+11. **Announcements** - Campus-wide communications
+12. **Expenses** - Personal expense tracking
+13. **Notes** - Study notes and materials
+14. **Community Posts** - Social features and discussions
+
+### API Endpoints
+- **Authentication**: User registration, login, password reset
+- **User Management**: Profile management and settings
+- **Academic Features**: Courses, assignments, grades, attendance
+- **Administrative**: Student/teacher management, course planning
+- **Financial**: Billing, payments, expense tracking
+- **Communication**: Announcements, community posts
+- **Study Tools**: Notes, calculators, wellness features
+
+### Security Features
+- Input validation and sanitization
+- Password hashing with bcrypt
+- JWT token-based authentication
+- Role-based access control
+- Rate limiting and CORS configuration
+- Helmet.js for HTTP header security
+
+### Performance Optimization
+- Database indexing strategies
+- API response caching
+- Connection pooling
+- Query optimization
+- CDN integration for static assets
 
 ## 📁 Project Structure
 
