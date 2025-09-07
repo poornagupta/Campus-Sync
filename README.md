@@ -1,5 +1,16 @@
 # CampusSync - Comprehensive Educational Management Platform
 
+[![React](https://img.shields.io/badge/React-18+-61DAFB?style=for-the-badge&logo=react&logoColor=white)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Vite](https://img.shields.io/badge/Vite-5.0+-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.0+-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Supabase](https://img.shields.io/badge/Supabase-2.0+-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white)](https://supabase.io/)
+[![Vercel](https://img.shields.io/badge/Vercel-Deployment-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
+[![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)](LICENSE)
+
+![CampusSync Dashboard](https://placehold.co/800x400/2563eb/white?text=CampusSync+Dashboard)
+*CampusSync Dashboard - Overview of all features*
+
 ## 🎓 Project Overview
 
 CampusSync is a modern, comprehensive educational management platform designed by **Mausam Kar** to streamline academic operations for students, teachers, and administrators. Built with cutting-edge technologies, it provides a unified solution for managing all aspects of campus life.
