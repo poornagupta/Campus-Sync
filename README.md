@@ -221,10 +221,6 @@ Contributions to CampusSync are welcome! As the creator, Mausam Kar has built a 
 4. Test thoroughly
 5. Submit a pull request
 
-## 📄 License
-
-This project is built with Lovable and follows their terms of service.
-
 ## 🆘 Support
 
 For questions or support:
@@ -232,3 +228,5 @@ For questions or support:
 - Join the [Lovable Discord Community](https://discord.com/channels/1119885301872070706/1280461670979993613)
 - Review the project structure in [FOLDER_STRUCTURE.md](./FOLDER_STRUCTURE.md)
 - Contact the creator: Mausam Kar
+- Email: mausamkar@example.com
+- GitHub: [mausamkar](https://github.com/mausamkar)
