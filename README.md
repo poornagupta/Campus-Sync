@@ -168,11 +168,8 @@ npm run build
 ### Using the Deployed Application (Recommended)
 Simply visit [CampusSync](https://campus-sync-seven.vercel.app/auth) to access the live application.
 
-### Using Lovable (Development Only)
-Simply visit the [Lovable Project](https://lovable.dev/projects/8c8ba721-0263-4934-b067-fa6a90b9418b) and start prompting. Changes made via Lovable will be committed automatically to this repo.
-
 ### Using Your Preferred IDE
-You can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+You can clone this repo and push changes.
 
 ### GitHub Codespaces
 - Navigate to the main page of your repository
@@ -185,16 +182,11 @@ You can clone this repo and push changes. Pushed changes will also be reflected 
 The application is deployed on Vercel and can be accessed at:
 [https://campus-sync-seven.vercel.app/auth](https://campus-sync-seven.vercel.app/auth)
 
-### Lovable Hosting (Development)
-Simply open [Lovable](https://lovable.dev/projects/8c8ba721-0263-4934-b067-fa6a90b9418b) and click on Share → Publish.
-
 ### Custom Domain
 To connect a custom domain:
 1. Navigate to Project > Settings > Domains
 2. Click Connect Domain
 3. Follow the setup instructions
-
-Read more: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain)
 
 ## 📊 Features in Detail
 
@@ -235,8 +227,6 @@ Contributions to CampusSync are welcome! As the creator, Mausam Kar has built a 
 ## 🆘 Support
 
 For questions or support:
-- Check the [Lovable Documentation](https://docs.lovable.dev/)
-- Join the [Lovable Discord Community](https://discord.com/channels/1119885301872070706/1280461670979993613)
 - Review the project structure in [FOLDER_STRUCTURE.md](./FOLDER_STRUCTURE.md)
 - Contact the creator: Mausam Kar
 - Email: mausamkar@example.com
