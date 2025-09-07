@@ -333,6 +333,181 @@ backend/
 }
 ```
 
+#### 15. Tasks Collection
+```javascript
+// Task Schema
+{
+  _id: ObjectId,
+  userId: ObjectId, // Reference to Users
+  title: String,
+  description: String,
+  dueDate: Date,
+  priority: Enum['low', 'medium', 'high'],
+  status: Enum['todo', 'in-progress', 'completed'],
+  tags: [String],
+  attachments: [String],
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+#### 16. Events Collection
+```javascript
+// Event Schema
+{
+  _id: ObjectId,
+  title: String,
+  description: String,
+  startDate: Date,
+  endDate: Date,
+  location: String,
+  organizer: ObjectId, // Reference to Users
+  attendees: [ObjectId], // References to Users
+  attachments: [String],
+  isPublic: Boolean,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+#### 17. Blog Collection
+```javascript
+// Blog Schema
+{
+  _id: ObjectId,
+  title: String,
+  content: String,
+  author: ObjectId, // Reference to Users
+  tags: [String],
+  category: String,
+  featuredImage: String,
+  likes: [ObjectId], // References to Users
+  comments: [{
+    userId: ObjectId, // Reference to Users
+    content: String,
+    createdAt: Date
+  }],
+  published: Boolean,
+  publishedAt: Date,
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+#### 18. Music Collection
+```javascript
+// Music Schema
+{
+  _id: ObjectId,
+  title: String,
+  artist: String,
+  album: String,
+  genre: String,
+  duration: Number, // in seconds
+  fileUrl: String,
+  coverArt: String,
+  uploadedBy: ObjectId, // Reference to Users
+  plays: Number,
+  likes: [ObjectId], // References to Users
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+#### 19. Meditation Collection
+```javascript
+// Meditation Schema
+{
+  _id: ObjectId,
+  title: String,
+  description: String,
+  duration: Number, // in seconds
+  category: String,
+  audioUrl: String,
+  coverArt: String,
+  instructor: String,
+  difficulty: Enum['beginner', 'intermediate', 'advanced'],
+  tags: [String],
+  plays: Number,
+  likes: [ObjectId], // References to Users
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+#### 20. Fitness Collection
+```javascript
+// Fitness Schema
+{
+  _id: ObjectId,
+  title: String,
+  description: String,
+  duration: Number, // in seconds
+  category: String,
+  difficulty: Enum['beginner', 'intermediate', 'advanced'],
+  videoUrl: String,
+  coverImage: String,
+  instructor: String,
+  equipment: [String],
+  tags: [String],
+  plays: Number,
+  likes: [ObjectId], // References to Users
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+#### 21. Academic Progress Collection
+```javascript
+// Academic Progress Schema
+{
+  _id: ObjectId,
+  studentId: ObjectId, // Reference to Students
+  courseId: ObjectId, // Reference to Courses
+  goals: [{
+    title: String,
+    description: String,
+    targetDate: Date,
+    completed: Boolean,
+    completedDate: Date
+  }],
+  milestones: [{
+    title: String,
+    description: String,
+    date: Date,
+    achieved: Boolean
+  }],
+  createdAt: Date,
+  updatedAt: Date
+}
+```
+
+#### 22. Calculators History Collection
+```javascript
+// Calculator History Schema
+{
+  _id: ObjectId,
+  userId: ObjectId, // Reference to Users
+  calculatorType: String, // 'cgpa', 'grade', 'loan', 'basic'
+  inputs: Object, // JSON object with input values
+  result: Object, // JSON object with result values
+  createdAt: Date
+}
+```
+
+#### 23. AI Assistant Collection
+```javascript
+// AI Assistant Schema
+{
+  _id: ObjectId,
+  userId: ObjectId, // Reference to Users
+  prompt: String,
+  response: String,
+  category: String, // 'academic', 'financial', 'general'
+  createdAt: Date
+}
+```
+
 ## 🔐 Authentication & Authorization
 
 ### JWT Implementation
@@ -373,6 +548,7 @@ GET /api/students/timetable - Student timetable
 GET /api/students/courses - Student courses
 GET /api/students/grades - Student grades
 GET /api/students/attendance - Student attendance
+GET /api/students/progress - Student academic progress
 ```
 
 ### Teacher Routes
@@ -477,6 +653,93 @@ PUT /api/community/posts/:id - Update post
 DELETE /api/community/posts/:id - Delete post
 POST /api/community/posts/:id/like - Like post
 POST /api/community/posts/:id/comment - Comment on post
+```
+
+### Task Routes
+```
+GET /api/tasks - Get user tasks
+GET /api/tasks/:id - Get task details
+POST /api/tasks - Create task
+PUT /api/tasks/:id - Update task
+DELETE /api/tasks/:id - Delete task
+```
+
+### Event Routes
+```
+GET /api/events - Get events
+GET /api/events/:id - Get event details
+POST /api/events - Create event
+PUT /api/events/:id - Update event
+DELETE /api/events/:id - Delete event
+POST /api/events/:id/attend - Mark attendance for event
+```
+
+### Blog Routes
+```
+GET /api/blog - Get blog posts
+GET /api/blog/:id - Get blog post details
+POST /api/blog - Create blog post
+PUT /api/blog/:id - Update blog post
+DELETE /api/blog/:id - Delete blog post
+POST /api/blog/:id/like - Like blog post
+POST /api/blog/:id/comment - Comment on blog post
+```
+
+### Music Routes
+```
+GET /api/music - Get music tracks
+GET /api/music/:id - Get music track details
+POST /api/music - Upload music track
+PUT /api/music/:id - Update music track
+DELETE /api/music/:id - Delete music track
+POST /api/music/:id/like - Like music track
+POST /api/music/:id/play - Record play count
+```
+
+### Meditation Routes
+```
+GET /api/meditation - Get meditation sessions
+GET /api/meditation/:id - Get meditation session details
+POST /api/meditation - Create meditation session
+PUT /api/meditation/:id - Update meditation session
+DELETE /api/meditation/:id - Delete meditation session
+POST /api/meditation/:id/like - Like meditation session
+POST /api/meditation/:id/play - Record play count
+```
+
+### Fitness Routes
+```
+GET /api/fitness - Get fitness workouts
+GET /api/fitness/:id - Get fitness workout details
+POST /api/fitness - Create fitness workout
+PUT /api/fitness/:id - Update fitness workout
+DELETE /api/fitness/:id - Delete fitness workout
+POST /api/fitness/:id/like - Like fitness workout
+POST /api/fitness/:id/play - Record play count
+```
+
+### Academic Progress Routes
+```
+GET /api/progress - Get academic progress
+GET /api/progress/:courseId - Get course progress
+POST /api/progress/:courseId/goals - Add goal
+PUT /api/progress/:courseId/goals/:goalId - Update goal
+DELETE /api/progress/:courseId/goals/:goalId - Delete goal
+```
+
+### Calculator Routes
+```
+GET /api/calculators/history - Get calculator history
+POST /api/calculators/cgpa - Calculate CGPA
+POST /api/calculators/grade - Calculate grades
+POST /api/calculators/loan - Calculate loan
+POST /api/calculators/basic - Basic calculations
+```
+
+### AI Assistant Routes
+```
+POST /api/ai/ask - Ask AI assistant
+GET /api/ai/history - Get AI conversation history
 ```
 
 ## 🔧 Middleware & Utilities
@@ -615,6 +878,9 @@ CLOUDINARY_API_SECRET=
 STRIPE_SECRET_KEY=
 STRIPE_PUBLISHABLE_KEY=
 
+# AI Service (optional)
+OPENAI_API_KEY=
+
 # Logging
 LOG_LEVEL=info
 ```
@@ -656,7 +922,19 @@ LOG_LEVEL=info
 3. Implement study tools
 4. Add wellness features
 
-### Phase 5: Optimization & Production
+### Phase 5: Specialized Features
+1. Implement task management
+2. Add event calendar
+3. Create blog system
+4. Integrate multimedia features (music, meditation, fitness)
+
+### Phase 6: Enhancement Features
+1. Academic progress tracking
+2. Calculator history
+3. AI assistant integration
+4. Performance optimization
+
+### Phase 7: Optimization & Production
 1. Performance optimization
 2. Security hardening
 3. API documentation
